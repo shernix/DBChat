@@ -1,28 +1,8 @@
 from flask import jsonify, request
-from dao.contact import ContactDAO
+from dao.dao import ContactDAO, ChatDAO
 
 
 class ContactHandler:
-    # def getAllContacts(self):
-    #     C1 = {}
-    #     C1['username'] = DiegoXDinero
-    #     C1['first_name'] = Diego
-    #     C1['last_name'] = Amador
-    #
-    #     C2 = {}
-    #     C2['username'] = Geeklusion
-    #     C2['first_name'] = Eduardo
-    #     C2['last_name'] = Santiago
-    #
-    #     C3 = {}
-    #     C3['username'] = coochielover
-    #     C3['first_name'] = JeanPaul
-    #     C3['last_name'] = Vicente
-    #
-    #     contacts = []
-    #     contacts.append(C1)
-    #     contacts.append(C2)
-    #     return jsonify(Contacts=contacts)
 
     def mapToContactDict(self, row):
         result = {}
@@ -60,4 +40,23 @@ class ContactHandler:
         for r in result:
             if keyword == r[1] or keyword == r[2] or keyword == r[3]:
                 mapped_result.append(self.mapToContactDict(r))
+        return jsonify(Contact=mapped_result)
+
+
+class ChatHandler:
+
+    def mapToChatDict(self, row):
+        result = {}
+        result['chid'] = row[0]
+        result['chname'] = row[1]
+        result['chadminid'] = row[2]
+
+        return result
+
+    def getAllChats(self):
+        dao = ChatDAO()
+        result = dao.getAllChats()
+        mapped_result = []
+        for r in result:
+            mapped_result.append(self.mapToChatDict(r))
         return jsonify(Contact=mapped_result)

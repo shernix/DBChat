@@ -1,5 +1,5 @@
 from flask import Flask, request
-from handler.contacts import ContactHandler
+from handler.handler import ContactHandler, ChatHandler
 
 
 app = Flask(__name__)
@@ -39,6 +39,11 @@ def getContactById(cid):
 @app.route('/kheApp/messaging')
 def messaging():
     return 'messaging'
+
+
+@app.route('/kheApp/chats')
+def chats():
+    return ChatHandler().getAllChats()
 
 
 if __name__ == '__main__':
