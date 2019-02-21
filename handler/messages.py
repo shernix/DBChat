@@ -23,8 +23,10 @@ class MessagesHandler:
     def getMessagesByChatID(self, id):
             dao = MessagesDAO()
             result = dao.getMessagesByChatID(id)
+            mapped_result = []
             if result == None:
                 return jsonify(Error="NOT FOUND"), 404
             else:
-                mapped = self.mapToMessagesDict(result)
-                return jsonify(Part=mapped)
+                for r in result:
+                    mapped_result.append(self.mapToMessagesDict(r))
+                return jsonify(Messages=mapped_result)
