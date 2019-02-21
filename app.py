@@ -1,6 +1,5 @@
 from flask import Flask, request
-from handler.contacts import ContactHandler
-from handler.messages import MessagesHandler
+from handler.handler import ContactHandler, MessagesHandler, ChatHandler
 
 
 app = Flask(__name__)
@@ -21,11 +20,11 @@ def dashboard():
     return 'statistics'
 
 
-#working on this rn
 @app.route('/kheApp/contacts')
 def contacts():
     if request.args:
-        return ContactHandler().searchContacts(request.args)
+        keyword = request.args['keyword']
+        return ContactHandler().searchContacts(keyword)
     else:
         handler = ContactHandler()
         return handler.getAllContacts()
@@ -35,25 +34,22 @@ def contacts():
 def getContactById(cid):
     return ContactHandler().getContactById(cid)
 
-# #search by first name
-# @app.route('/kheApp/contacts/<cfirstname>')
-# def getContactByFirstName(cfirstname):
-#     return ContactHandler().getContactByFirstName(cfirstname)
-
-
-@app.route('/kheApp/chats')
-def messaging():
-    return 'All Chats'
 
 @app.route('/kheApp/messages')
 def getMessage():
     handler = MessagesHandler()
     return handler.getAllMessages()
 
+
 @app.route('/kheApp/messages/<int:chid>')
 def getMessageByChatID(chid):
     handler = MessagesHandler()
     return handler.getMessagesByChatID(chid)
+
+
+@app.route('/kheApp/chats')
+def getChats():
+    return ChatHandler().getAllChats()
 
 
 if __name__ == '__main__':
