@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BookmarkManager">
+    <bookmark url="file://$PROJECT_DIR$/app.py" line="23" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="bf6a852a-b26c-4498-ad29-aaffd08e9218" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dao/dao.py" beforeDir="false" afterPath="$PROJECT_DIR$/dao/dao.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dao/users.py" beforeDir="false" afterPath="$PROJECT_DIR$/dao/usersdao.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/handler/handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/handler/handler.py" afterDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="60">
+              <caret line="4" column="21" lean-forward="true" selection-start-line="4" selection-start-column="21" selection-end-line="4" selection-end-column="21" />
+              <folding>
+                <element signature="e#0#32#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/handler/handler.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1395">
+              <caret line="93" selection-start-line="93" selection-end-line="93" />
+              <folding>
+                <element signature="e#0#34#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/dao/dao.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="615">
+              <caret line="41" selection-start-line="41" selection-end-line="41" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>navbar</find>
+    </findStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="Development" />
+      </map>
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/AppPage/Chat.html" />
+        <option value="$PROJECT_DIR$/AppPage/home.html" />
+        <option value="$PROJECT_DIR$/templates/layout.html" />
+        <option value="$PROJECT_DIR$/templates/home.html" />
+        <option value="$PROJECT_DIR$/templates/includes/_navbar.html" />
+        <option value="$PROJECT_DIR$/templates/includes/dashboard.html.py" />
+        <option value="$PROJECT_DIR$/templates/messaging.html" />
+        <option value="$PROJECT_DIR$/templates/dashboard.html" />
+        <option value="$PROJECT_DIR$/templates/contacts.html" />
+        <option value="$PROJECT_DIR$/dao/chats.py" />
+        <option value="$PROJECT_DIR$/handler/ContactsHandler.py" />
+        <option value="$PROJECT_DIR$/dao/user.py" />
+        <option value="$PROJECT_DIR$/handler/chats.py" />
+        <option value="$PROJECT_DIR$/dao/chat.py" />
+        <option value="$PROJECT_DIR$/dao/contact.py" />
+        <option value="$PROJECT_DIR$/handler/contacts.py" />
+        <option value="$PROJECT_DIR$/handler/handler.py" />
+        <option value="$PROJECT_DIR$/dao/dao.py" />
+        <option value="$PROJECT_DIR$/app.py" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="147" />
+    <option name="y" value="37" />
+    <option name="width" value="1357" />
+    <option name="height" value="986" />
+  </component>
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="DBChat" type="b2602c69:ProjectViewProjectNode" />
+              <item name="DBChat" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="DBChat" type="b2602c69:ProjectViewProjectNode" />
+              <item name="DBChat" type="462c0819:PsiDirectoryNode" />
+              <item name="dao" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="DBChat" type="b2602c69:ProjectViewProjectNode" />
+              <item name="DBChat" type="462c0819:PsiDirectoryNode" />
+              <item name="handler" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="DBChat" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/dao" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration name="app" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="DBChat" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/app.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.app" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="bf6a852a-b26c-4498-ad29-aaffd08e9218" name="Default Changelist" comment="" />
+      <created>1549814678654</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1549814678654</updated>
+    </task>
+    <task id="LOCAL-00001" summary="Initial app commit">
+      <created>1549815026936</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1549815026936</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Created a default layout for all routes">
+      <created>1549824123474</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1549824123474</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Updated a layout for all routes">
+      <created>1549904220107</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1549904220107</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Created a route for hard wired contacts">
+      <created>1550704794383</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1550704794383</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Can search for contacts using contacts/keyword=example">
+      <created>1550710626592</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1550710626592</updated>
+    </task>
+    <task id="LOCAL-00006" summary="added chats route">
+      <created>1550712911639</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1550712911639</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
+    <servers />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-3" y="-1" width="1686" height="1027" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17320459" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.3288889" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49969825" weight="0.39222223" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Version Control" order="7" weight="0.23888889" />
+      <window_info anchor="bottom" id="Terminal" order="8" />
+      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.5003018" side_tool="true" weight="0.39222223" />
+      <window_info anchor="bottom" id="Python Console" order="10" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+    </layout>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Initial app commit" />
+    <MESSAGE value="Created a default layout for all routes" />
+    <MESSAGE value="Updated a layout for all routes" />
+    <MESSAGE value="Created a route for hard wired contacts" />
+    <MESSAGE value="Can search for contacts using contacts/keyword=example" />
+    <MESSAGE value="added chats route" />
+    <MESSAGE value="Merged conflicts w/ EduardoBranch&#10;&#10;fixed messages route" />
+    <MESSAGE value="Merge branch 'EduardoBranch' of https://github.com/shernix/DBChat into JavierBranch&#10;&#10;# Conflicts:&#10;#&#9;app.py&#10;#&#9;dao/contact.py&#10;#&#9;dao/contactdao.py&#10;#&#9;dao/dao.py&#10;#&#9;handler/handler.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="Merge branch 'EduardoBranch' of https://github.com/shernix/DBChat into JavierBranch&#10;&#10;# Conflicts:&#10;#&#9;app.py&#10;#&#9;dao/contact.py&#10;#&#9;dao/contactdao.py&#10;#&#9;dao/dao.py&#10;#&#9;handler/handler.py" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/AppPage/home.html" />
+    <entry file="file://$PROJECT_DIR$/AppPage/css.css" />
+    <entry file="file://$PROJECT_DIR$/templates/includes/_navbar.html" />
+    <entry file="file://$PROJECT_DIR$/templates/includes/dashboard.html.py" />
+    <entry file="file://$PROJECT_DIR$/templates/contacts.html" />
+    <entry file="file://$PROJECT_DIR$/templates/messaging.html" />
+    <entry file="file://$PROJECT_DIR$/templates/dashboard.html" />
+    <entry file="file://$PROJECT_DIR$/templates/layout.html" />
+    <entry file="file://$PROJECT_DIR$/templates/home.html" />
+    <entry file="file://$PROJECT_DIR$/AppPage/Chat.html" />
+    <entry file="file://$PROJECT_DIR$/dao/chats.py" />
+    <entry file="file://$PROJECT_DIR$/dao/users.py" />
+    <entry file="file://$PROJECT_DIR$/dao/chat.py" />
+    <entry file="file://$PROJECT_DIR$/handler/chats.py" />
+    <entry file="file://$PROJECT_DIR$/dao/contactdao.py" />
+    <entry file="file://$PROJECT_DIR$/dao/messagesdao.py" />
+    <entry file="file://$USER_HOME$/venvs/icom5016/lib/python3.6/site-packages/flask/app.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="253">
+          <caret line="1617" selection-start-line="1617" selection-end-line="1617" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/handler/messages.py" />
+    <entry file="file://$PROJECT_DIR$/app.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="21" lean-forward="true" selection-start-line="4" selection-start-column="21" selection-end-line="4" selection-end-column="21" />
+          <folding>
+            <element signature="e#0#32#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dao/dao.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="615">
+          <caret line="41" selection-start-line="41" selection-end-line="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/handler/handler.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1395">
+          <caret line="93" selection-start-line="93" selection-end-line="93" />
+          <folding>
+            <element signature="e#0#34#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

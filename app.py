@@ -1,5 +1,5 @@
 from flask import Flask, request
-from handler.handler import ContactHandler, ChatHandler
+from handler.handler import ContactHandler, MessagesHandler, ChatHandler
 
 
 app = Flask(__name__)
@@ -36,13 +36,20 @@ def getContactById(cid):
     return ContactHandler().getContactById(cid)
 
 
-@app.route('/kheApp/messaging')
-def messaging():
-    return 'messaging'
+@app.route('/kheApp/messages')
+def getMessage():
+    handler = MessagesHandler()
+    return handler.getAllMessages()
+
+
+@app.route('/kheApp/messages/<int:chid>')
+def getMessageByChatID(chid):
+    handler = MessagesHandler()
+    return handler.getMessagesByChatID(chid)
 
 
 @app.route('/kheApp/chats')
-def chats():
+def getChats():
     return ChatHandler().getAllChats()
 
 
