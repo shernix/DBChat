@@ -31,8 +31,8 @@ def contacts():
 
 
 @app.route('/kheApp/contacts/<int:cid>')
-def getContactById(cid):
-    return ContactHandler().getContactById(cid)
+def getContactByID(cid):
+    return ContactHandler().getContactByID(cid)
 
 
 @app.route('/kheApp/messages')

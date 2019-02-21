@@ -25,7 +25,7 @@ class ContactHandler:
 
     def getContactByID(self, id):
         dao = ContactDAO()
-        result = dao.getContactById(id)
+        result = dao.getContactByID(id)
         if result == None:
             return jsonify(Error="NOT FOUND"), 404
         else:
