@@ -20,7 +20,6 @@ def dashboard():
     return 'statistics'
 
 
-#working on this rn
 @app.route('/kheApp/contacts')
 def contacts():
     if request.args:
