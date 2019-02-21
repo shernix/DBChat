@@ -24,7 +24,8 @@ def dashboard():
 @app.route('/kheApp/contacts')
 def contacts():
     if request.args:
-        return ContactHandler().searchContacts(request.args)
+        keyword = request.args['keyword']
+        return ContactHandler().searchContacts(keyword)
     else:
         handler = ContactHandler()
         return handler.getAllContacts()
@@ -33,11 +34,6 @@ def contacts():
 @app.route('/kheApp/contacts/<int:cid>')
 def getContactById(cid):
     return ContactHandler().getContactById(cid)
-
-# #search by first name
-# @app.route('/kheApp/contacts/<cfirstname>')
-# def getContactByFirstName(cfirstname):
-#     return ContactHandler().getContactByFirstName(cfirstname)
 
 
 @app.route('/kheApp/messaging')

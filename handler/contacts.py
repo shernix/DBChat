@@ -51,3 +51,13 @@ class ContactHandler:
         else:
             mapped = self.mapToContactDict(result)
             return jsonify(Part=mapped)
+
+    def searchContacts(self, keyword):
+        print(keyword)
+        dao = ContactDAO()
+        result = dao.getAllContacts()
+        mapped_result = []
+        for r in result:
+            if keyword == r[1] or keyword == r[2] or keyword == r[3]:
+                mapped_result.append(self.mapToContactDict(r))
+        return jsonify(Contact=mapped_result)

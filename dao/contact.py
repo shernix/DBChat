@@ -5,12 +5,14 @@ class ContactDAO:
         C2 = [2, 'edusanti', 'eduardo', 'santiago', 'edusanti@upr.edu', '7871111111']
         C3 = [3, 'javelez', 'javier', 'velez', 'javier.velez@upr.edu', '7872222222']
         C4 = [4, 'pedro1', 'pedro', 'perez', 'pperez@upr.edu', '7873333333']
+        C5 = [4, 'moosclus', 'diego', 'perez', 'dieguito@yahoo.com', '7874444444']
 
         self.data = []
         self.data.append(C1)
         self.data.append(C2)
         self.data.append(C3)
         self.data.append(C4)
+        self.data.append(C5)
 
     def getAllContacts(self):
         return self.data
