@@ -20,7 +20,7 @@ def dashboard():
     return 'statistics'
 
 
-@app.route('/kheApp/contacts')
+@app.route('/kheApp/contacts', methods=['GET', 'POST'])
 def contacts():
     if request.method == 'POST':
         return 'contact added!'

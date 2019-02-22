@@ -2,6 +2,9 @@ from flask import jsonify, request
 from dao.dao import ContactDAO, ChatDAO, MessagesDAO
 
 
+################################################################################################
+#                                         CONTACT HANDLER                                      #
+################################################################################################
 class ContactHandler:
 
     def mapToContactDict(self, row):
@@ -59,6 +62,10 @@ class ContactHandler:
             return jsonify(Error="Malformed search string."), 400
 
 
+################################################################################################
+#                                         CHAT HANDLER                                         #
+################################################################################################
+
 class ChatHandler:
 
     def mapToChatDict(self, row):
@@ -78,6 +85,9 @@ class ChatHandler:
         return jsonify(Contact=mapped_result)
 
 
+################################################################################################
+#                                        MESSAGES HANDLER                                      #
+################################################################################################
 class MessagesHandler:
 
     def mapToMessagesDict(self, row):
