@@ -29,7 +29,7 @@ class ContactDAO:
     def getContactsByKeyword(self, keyword, dictIndex):
         mapped_result = []
         for r in self.data:
-            if keyword == r[dictIndex]:
+            if keyword.lower() == r[dictIndex].lower():
                 mapped_result.append(r)
         return mapped_result
 
@@ -37,6 +37,7 @@ class ContactDAO:
 class ChatDAO:
     def __init__(self):
 
+        # CH = [chatid, ownerid, chatname]
         CH1 = [1, 3, 'PLBois']
         CH2 = [2, 1, 'Los traperos full']
         CH3 = [3, 1, 'TestChat']
@@ -48,6 +49,19 @@ class ChatDAO:
 
     def getAllChats(self):
         return self.data
+
+    def getChatByID(self, id):
+        for r in self.data:
+            if id == r[0]:
+                return r
+        return None
+
+    def getChatsByChatName(self, chatname):
+        mapped_result = []
+        for r in self.data:
+            if chatname.lower() == r[2].lower():
+                mapped_result.append(r)
+        return mapped_result
 
 
 class MessagesDAO:

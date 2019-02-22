@@ -5,6 +5,7 @@ from dao.dao import ContactDAO, ChatDAO, MessagesDAO
 ################################################################################################
 #                                         CONTACT HANDLER                                      #
 ################################################################################################
+
 class ContactHandler:
 
     def mapToContactDict(self, row):
@@ -33,7 +34,7 @@ class ContactHandler:
             return jsonify(Error="CONTACT NOT FOUND"), 404
         else:
             mapped = self.mapToContactDict(result)
-            return jsonify(Part=mapped)
+            return jsonify(Contact=mapped)
 
     def searchContacts(self, args):
         if len(args) > 1:
@@ -84,10 +85,37 @@ class ChatHandler:
             mapped_result.append(self.mapToChatDict(r))
         return jsonify(Contact=mapped_result)
 
+    def getChatByID(self, id):
+        dao = ChatDAO()
+        result = dao.getChatByID(id)
+        if result == None:
+            return jsonify(Error="CHAT NOT FOUND"), 404
+        else:
+            mapped = self.mapToChatDict(result)
+            return jsonify(Chat=mapped)
+
+    def searchChats(self, args):
+        if len(args) > 1:
+            #print(args)
+            return jsonify(Error="Malformed search string."), 400
+        chatname = args.get("chatname")
+        print(chatname)
+        if chatname:
+            dao = ChatDAO()
+            chat_list = dao.getChatsByChatName(chatname)
+            result_list = []
+            for row in chat_list:
+                result = self.mapToChatDict(row)
+                result_list.append(result)
+            return jsonify(Chas=result_list)
+        else:
+            return jsonify(Error="Malformed search string."), 400
+
 
 ################################################################################################
 #                                        MESSAGES HANDLER                                      #
 ################################################################################################
+
 class MessagesHandler:
 
     def mapToMessagesDict(self, row):

@@ -39,11 +39,9 @@ def getContactByID(cid):
     elif request.method == 'PUT':
         return 'Updated contact!'  # ContactHandler().updateContact(cid, request.form)
     elif request.method == 'DELETE':
-        return 'Deleted contact!'  # ContactHAndler().deleteContact(pid)
+        return 'Deleted contact!'  # ContactHandler().deleteContact(pid)
     else:
         return jsonify(Error="Method not allowed."), 405
-
-    # return ContactHandler().getContactByID(cid)
 
 
 # #this is a route that isn't supposed to exist
@@ -59,10 +57,28 @@ def getMessageByChatID(chid):
     return handler.getMessagesByChatID(chid)
 
 
-@app.route('/kheApp/chats')
+@app.route('/kheApp/chats', methods=['GET', 'POST'])
 def getChats():
-    return ChatHandler().getAllChats()
+    if request.method == 'POST':
+        print("REQUEST: ", request.json)
+        return 'Chat created!'
+    else:
+        if not request.args:
+            return ChatHandler().getAllChats()
+        else:
+            return ChatHandler().searchChats(request.args)
 
+
+@app.route('/kheApp/chats/<int:chid>', methods=['GET', 'PUT', 'DELETE'])
+def getChatsByID(chid):
+    if request.method == 'GET':
+        return ChatHandler().getChatByID(chid)
+    elif request.method == 'PUT':
+        return 'Updated Chat!'  # ChatHandler().updateChat(chid, request.form)
+    elif request.method == 'DELETE':
+        return 'Deleted Chat!'  # ChatHandler().deleteChat(chid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
 
 if __name__ == '__main__':
     app.run(debug=True)
