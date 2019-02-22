@@ -35,10 +35,11 @@ def getContactByID(cid):
     return ContactHandler().getContactByID(cid)
 
 
-@app.route('/kheApp/messages')
-def getMessage():
-    handler = MessagesHandler()
-    return handler.getAllMessages()
+# #this is a route that isn't supposed to exist
+# @app.route('/kheApp/messages')
+# def getMessage():
+#     handler = MessagesHandler()
+#     return handler.getAllMessages()
 
 
 @app.route('/kheApp/messages/<int:chid>')
