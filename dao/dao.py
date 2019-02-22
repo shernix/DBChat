@@ -33,6 +33,32 @@ class ContactDAO:
                 mapped_result.append(r)
         return mapped_result
 
+    def insert(self, cusername, cfirstname, clastname, cemail, cphonenumber):
+        # cursor = self.conn.cursor()
+        # query = "insert into contacts(cusername, cfirstname, clastname, cemail, cphonenumber) values (%s, %s, %s, %s) returning cid;"
+        # cursor.execute(query, (cusername, cfirstname, clastname, cemail, cphonenumber))
+        # cid = cursor.fetchone()[0]
+        # self.conn.commit()
+        # return cid
+        return 7
+
+    def update(self, cid, cusername, cfirstname, clastname, cemail, cphonenumber):
+        # cursor = self.conn.cursor()
+        # query = "update contacts set cusername = %s, cfirstname = %s, clastname = %s, cemail = %s, cphonenumber = %s where cid = %s;"
+        # cursor.execute(query, (cusername, cfirstname, clastname, cemail, cphonenumber, cid,))
+        # self.conn.commit()
+        # return cid
+        return cid
+
+    def delete(self, cid):
+        # cursor = self.conn.cursor()
+        # query = "delete from contacts where cid = %s;"
+        # cursor.execute(query, (cid,))
+        # self.conn.commit()
+        # return cid
+        return cid
+
+
 
 class ChatDAO:
     def __init__(self):

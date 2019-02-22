@@ -23,8 +23,8 @@ def dashboard():
 @app.route('/kheApp/contacts', methods=['GET', 'POST'])
 def contacts():
     if request.method == 'POST':
-        print("REQUEST: ", request.json)
-        return 'contact added!'
+        print("REQUEST: ", request.method)
+        return ContactHandler().insertContactJson(request.args)  # 'Contact added!'
     else:
         if not request.args:
             return ContactHandler().getAllContacts()
@@ -37,9 +37,9 @@ def getContactByID(cid):
     if request.method == 'GET':
         return ContactHandler().getContactByID(cid)
     elif request.method == 'PUT':
-        return 'Updated contact!'  # ContactHandler().updateContact(cid, request.form)
+        return ContactHandler().updateContact(cid, request.args)  # 'Updated contact!'
     elif request.method == 'DELETE':
-        return 'Deleted contact!'  # ContactHandler().deleteContact(pid)
+        return ContactHandler().deleteContact(cid)  # 'Deleted contact!'
     else:
         return jsonify(Error="Method not allowed."), 405
 
@@ -79,6 +79,7 @@ def getChatsByID(chid):
         return 'Deleted Chat!'  # ChatHandler().deleteChat(chid)
     else:
         return jsonify(Error="Method not allowed."), 405
+
 
 if __name__ == '__main__':
     app.run(debug=True)

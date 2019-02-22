@@ -16,7 +16,16 @@ class ContactHandler:
         result['clastname'] = row[3]
         result['cemail'] = row[4]
         result['cphonenumber'] = row[5]
+        return result
 
+    def mapToContactAttributes(self, cid, cusername, cfirstname, clastname, cemail, cphonenumber):
+        result = {}
+        result['cid'] = cid
+        result['cusername'] = cusername
+        result['cfirstname'] = cfirstname
+        result['clastname'] = clastname
+        result['cemail'] = cemail
+        result['cphonenumber'] = cphonenumber
         return result
 
     def getAllContacts(self):
@@ -61,6 +70,55 @@ class ContactHandler:
             return jsonify(Contacts=result_list)
         else:
             return jsonify(Error="Malformed search string."), 400
+
+    def insertContactJson(self, args):
+        # cid = json['cid']
+        cusername = args.get('cusername')
+        cfirstname = args.get('cfirstname')
+        clastname = args.get('clastname')
+        cemail = args.get('cemail')
+        cphonenumber = args.get('cphonenumber')
+        if cemail == None:
+            cemail = 'empty'
+        if cphonenumber == None:
+            cphonenumber = 'empty'
+
+        if cusername and cfirstname and clastname and cemail and cphonenumber:
+            dao = ContactDAO()
+            cid = dao.insert(cusername, cfirstname, clastname, cemail, cphonenumber)
+            result = self.mapToContactAttributes(cid, cusername, cfirstname, clastname, cemail, cphonenumber)
+            return jsonify(Contact=result), 201
+        else:
+            return jsonify(Error="Unexpected attributes in post request"), 400
+
+    def updateContact(self, cid, args):
+        dao = ContactDAO()
+        if not dao.getContactByID(cid):
+            return jsonify(Error="Contactt not found."), 404
+        else:
+            cusername = args.get('cusername')
+            cfirstname = args.get('cfirstname')
+            clastname = args.get('clastname')
+            cemail = args.get('cemail')
+            cphonenumber = args.get('cphonenumber')
+            if cemail == None:
+                cemail = 'empty'
+            if cphonenumber == None:
+                cphonenumber = 'empty'
+            if cusername and cfirstname and clastname and cemail and cphonenumber:
+                dao.update(cid, cusername, cfirstname, clastname, cemail, cphonenumber)
+                result = self.mapToContactAttributes(cid, cusername, cfirstname, clastname, cemail, cphonenumber)
+                return jsonify(Contact=result), 200
+            else:
+                return jsonify(Error="Unexpected attributes in update request"), 400
+
+    def deleteContact(self, cid):
+        dao = ContactDAO()
+        if not dao.getContactByID(cid):
+            return jsonify(Error="Contact not found."), 404
+        else:
+            dao.delete(cid)
+            return jsonify(DeleteStatus = "OK"), 200
 
 
 ################################################################################################
