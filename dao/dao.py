@@ -6,6 +6,7 @@ class ContactDAO:
         C3 = [3, 'javelez', 'javier', 'velez', 'javier.velez@upr.edu', '7872222222']
         C4 = [4, 'pedro1', 'pedro', 'perez', 'pperez@upr.edu', '7873333333']
         C5 = [5, 'moosclus', 'diego', 'perez', 'dieguito@yahoo.com', '7874444444']
+        C6 = [6, 'wop', 'panky', 'arroyo', '', '']
 
         self.data = []
         self.data.append(C1)
@@ -13,6 +14,7 @@ class ContactDAO:
         self.data.append(C3)
         self.data.append(C4)
         self.data.append(C5)
+        self.data.append(C6)
 
     def getAllContacts(self):
         return self.data
@@ -23,6 +25,13 @@ class ContactDAO:
             if id == r[0]:
                 return r
         return None
+
+    def getContactsByKeyword(self, keyword, dictIndex):
+        mapped_result = []
+        for r in self.data:
+            if keyword == r[dictIndex]:
+                mapped_result.append(r)
+        return mapped_result
 
 
 class ChatDAO:

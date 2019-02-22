@@ -22,12 +22,13 @@ def dashboard():
 
 @app.route('/kheApp/contacts')
 def contacts():
-    if request.args:
-        keyword = request.args['keyword']
-        return ContactHandler().searchContacts(keyword)
+    if request.method == 'POST':
+        return 'contact added!'
     else:
-        handler = ContactHandler()
-        return handler.getAllContacts()
+        if not request.args:
+            return ContactHandler().getAllContacts()
+        else:
+            return ContactHandler().searchContacts(request.args)
 
 
 @app.route('/kheApp/contacts/<int:cid>')

@@ -32,15 +32,31 @@ class ContactHandler:
             mapped = self.mapToContactDict(result)
             return jsonify(Part=mapped)
 
-    def searchContacts(self, keyword):
+    def searchContacts(self, args):
+        if len(args) > 1:
+            #print(args)
+            return jsonify(Error="Malformed search string."), 400
+        elif args.get("firstname"):
+            keyword = args.get("firstname")
+            dictIndex = 2
+        elif args.get("lastname"):
+            keyword = args.get("lastname")
+            dictIndex = 3
+        else:
+            keyword = args.get("username")
+            dictIndex = 1
+
         print(keyword)
-        dao = ContactDAO()
-        result = dao.getAllContacts()
-        mapped_result = []
-        for r in result:
-            if keyword == r[1] or keyword == r[2] or keyword == r[3]:
-                mapped_result.append(self.mapToContactDict(r))
-        return jsonify(Contact=mapped_result)
+        if keyword:
+            dao = ContactDAO()
+            contact_list = dao.getContactsByKeyword(keyword, dictIndex)
+            result_list = []
+            for row in contact_list:
+                result = self.mapToContactDict(row)
+                result_list.append(result)
+            return jsonify(Contacts=result_list)
+        else:
+            return jsonify(Error="Malformed search string."), 400
 
 
 class ChatHandler:
