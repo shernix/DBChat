@@ -30,7 +30,7 @@ class ContactHandler:
         dao = ContactDAO()
         result = dao.getContactByID(id)
         if result == None:
-            return jsonify(Error="NOT FOUND"), 404
+            return jsonify(Error="CONTACT NOT FOUND"), 404
         else:
             mapped = self.mapToContactDict(result)
             return jsonify(Part=mapped)
@@ -112,7 +112,7 @@ class MessagesHandler:
         result = dao.getMessagesByChatID(id)
         mapped_result = []
         if result == None:
-            return jsonify(Error="NOT FOUND"), 404
+            return jsonify(Error="MESSAGE NOT FOUND"), 404
         else:
             for r in result:
                 mapped_result.append(self.mapToMessagesDict(r))

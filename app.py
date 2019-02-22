@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from handler.handler import ContactHandler, MessagesHandler, ChatHandler
 
 
@@ -23,6 +23,7 @@ def dashboard():
 @app.route('/kheApp/contacts', methods=['GET', 'POST'])
 def contacts():
     if request.method == 'POST':
+        print("REQUEST: ", request.json)
         return 'contact added!'
     else:
         if not request.args:
@@ -31,9 +32,18 @@ def contacts():
             return ContactHandler().searchContacts(request.args)
 
 
-@app.route('/kheApp/contacts/<int:cid>')
+@app.route('/kheApp/contacts/<int:cid>', methods=['GET', 'PUT', 'DELETE'])
 def getContactByID(cid):
-    return ContactHandler().getContactByID(cid)
+    if request.method == 'GET':
+        return ContactHandler().getContactByID(cid)
+    elif request.method == 'PUT':
+        return 'Updated contact!'  # ContactHandler().updateContact(cid, request.form)
+    elif request.method == 'DELETE':
+        return 'Deleted contact!'  # ContactHAndler().deleteContact(pid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+    # return ContactHandler().getContactByID(cid)
 
 
 # #this is a route that isn't supposed to exist
