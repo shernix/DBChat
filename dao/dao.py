@@ -35,7 +35,7 @@ class ContactDAO:
 
     def insert(self, cusername, cfirstname, clastname, cemail, cphonenumber):
         # cursor = self.conn.cursor()
-        # query = "insert into contacts(cusername, cfirstname, clastname, cemail, cphonenumber) values (%s, %s, %s, %s) returning cid;"
+        # query = "insert into contacts(cusername, cfirstname, clastname, cemail, cphonenumber) values (%s, %s, %s, %s, %s) returning cid;"
         # cursor.execute(query, (cusername, cfirstname, clastname, cemail, cphonenumber))
         # cid = cursor.fetchone()[0]
         # self.conn.commit()
@@ -63,10 +63,10 @@ class ContactDAO:
 class ChatDAO:
     def __init__(self):
 
-        # CH = [chatid, ownerid, chatname]
-        CH1 = [1, 3, 'PLBois']
-        CH2 = [2, 1, 'Los traperos full']
-        CH3 = [3, 1, 'TestChat']
+        # CH = [chatid, chatname, chatadminid]
+        CH1 = [1, 'PLBois', 3]
+        CH2 = [2, 'Los traperos full', 1]
+        CH3 = [3, 'TestChat', 1]
 
         self.data = []
         self.data.append(CH1)
@@ -88,6 +88,31 @@ class ChatDAO:
             if chatname.lower() == r[2].lower():
                 mapped_result.append(r)
         return mapped_result
+
+    def insert(self, chname, chadminid):
+        # cursor = self.conn.cursor()
+        # query = "insert into chats(chnamem chadminid) values (%s, %s) returning chid;"
+        # cursor.execute(query, (chname, chadminid))
+        # cid = cursor.fetchone()[0]
+        # self.conn.commit()
+        # return chid
+        return 3
+
+    def update(self, chid, chname, chadminid):
+        # cursor = self.conn.cursor()
+        # query = "update chats set chname = %s, cadminid = %s where chid = %s;"
+        # cursor.execute(query, (chname, chadminid, chid,))
+        # self.conn.commit()
+        # return cid
+        return chid
+
+    def delete(self, chid):
+        # cursor = self.conn.cursor()
+        # query = "delete from chats where chid = %s;"
+        # cursor.execute(query, (cid,))
+        # self.conn.commit()
+        # return cid
+        return chid
 
 
 class MessagesDAO:

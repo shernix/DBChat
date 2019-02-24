@@ -60,8 +60,8 @@ def getMessageByChatID(chid):
 @app.route('/kheApp/chats', methods=['GET', 'POST'])
 def getChats():
     if request.method == 'POST':
-        print("REQUEST: ", request.json)
-        return 'Chat created!'
+        print("REQUEST: ", request.method)
+        return ChatHandler().insertChat(request.args)  # 'Chat created!'
     else:
         if not request.args:
             return ChatHandler().getAllChats()
@@ -74,9 +74,9 @@ def getChatsByID(chid):
     if request.method == 'GET':
         return ChatHandler().getChatByID(chid)
     elif request.method == 'PUT':
-        return 'Updated Chat!'  # ChatHandler().updateChat(chid, request.form)
+        return ChatHandler().updateChat(chid, request.args)  # 'Updated Chat!'
     elif request.method == 'DELETE':
-        return 'Deleted Chat!'  # ChatHandler().deleteChat(chid)
+        return ChatHandler().deleteChat(chid)  # 'Deleted Chat!'
     else:
         return jsonify(Error="Method not allowed."), 405
 

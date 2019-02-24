@@ -94,7 +94,7 @@ class ContactHandler:
     def updateContact(self, cid, args):
         dao = ContactDAO()
         if not dao.getContactByID(cid):
-            return jsonify(Error="Contactt not found."), 404
+            return jsonify(Error="Contact not found."), 404
         else:
             cusername = args.get('cusername')
             cfirstname = args.get('cfirstname')
@@ -135,6 +135,14 @@ class ChatHandler:
 
         return result
 
+    def mapToChatAttributes(self, chid, chname, chadminid):
+        result = {}
+        result['chid'] = chid
+        result['chname'] = chname
+        result['chadminid'] = chadminid
+
+        return result
+
     def getAllChats(self):
         dao = ChatDAO()
         result = dao.getAllChats()
@@ -168,6 +176,40 @@ class ChatHandler:
             return jsonify(Chas=result_list)
         else:
             return jsonify(Error="Malformed search string."), 400
+
+    def insertChat(self, args):
+        chname = args.get('chname')
+        chadminid = 1  # args.get('chadminid')
+        if chname and chadminid:
+            dao = ChatDAO()
+            chid = dao.insert(chname, chadminid)
+            result = self.mapToChatAttributes(chid, chname, chadminid)
+            return jsonify(Chat=result), 201
+        else:
+            return jsonify(Error="Unexpected attributes in post request"), 400
+
+    def updateChat(self, chid, args):
+        dao = ChatDAO()
+        if not dao.getChatByID(chid):
+            return jsonify(Error="Chat not found."), 404
+        else:
+            chname = args.get('chname')
+            chadminid = 1  # placeholder
+            if chname and chadminid:
+                dao.update(chid, chname, chadminid)
+                result = self.mapToChatAttributes(chid, chname, chadminid)
+                return jsonify(Chat=result), 200
+            else:
+                return jsonify(Error="Unexpected attributes in update request"), 400
+
+    def deleteChat(self, chid):
+        dao = ChatDAO()
+        if not dao.getChatByID(chid):
+            return jsonify(Error="Chat not found."), 404
+        else:
+            dao.delete(chid)
+            return jsonify(DeleteStatus = "OK"), 200
+
 
 
 ################################################################################################
