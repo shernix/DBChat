@@ -182,6 +182,9 @@ class MessagesHandler:
         result['message'] = row[1]
         result['user_id'] = row[2]
         result['timestamp'] = row[3]
+        result['message_id'] = row[4]
+        result['likes'] = row[5]
+        result['dislikes'] = row[6]
 
         return result
 
@@ -203,3 +206,81 @@ class MessagesHandler:
             for r in result:
                 mapped_result.append(self.mapToMessagesDict(r))
             return jsonify(Messages=mapped_result)
+
+    def postMessagesByChatID(self, args):
+        # cid = json['cid']
+        message = args.get('message')
+        user_id = args.get('user_id')
+        timestamp = args.get('timestamp')
+
+        if chid and message and user_id and timestamp:
+            dao = MessagesDAO()
+            cid = dao.insert(message, user_id, timestamp)
+            result = self.mapToContactAttributes(cid, message, user_id, timestamp)
+            return jsonify(Contact=result), 201
+        else:
+            return jsonify(Error="Unexpected attributes in post request"), 400
+
+    def deleteMessagesByChatID(self, cid):
+        dao = MessagesDAO()
+        if not dao.getMessagesByChatID(cid):
+            return jsonify(Error="Messages not found."), 404
+        else:
+            dao.delete(cid)
+            return jsonify(DeleteStatus = "OK"), 200
+    
+    def deleteMessagesByID(self, cid):
+        dao = MessagesDAO()
+        if not dao.getMessagesByChatID(cid):
+            return jsonify(Error="Messages not found."), 404
+        else:
+            dao.delete(cid)
+            return jsonify(DeleteStatus = "OK"), 200
+
+    def getMessageByID(self, id):
+        dao = MessagesDAO()
+        result = dao.getMessageByID(id)
+        if result == None:
+            return jsonify(Error="MESSAGE NOT FOUND"), 404
+        else:
+            mapped = self.mapToMessagesDict(result)
+            return jsonify(Message=mapped)
+
+    def getMessageLikes(self, message_id):
+        return jsonify(Likes=MessagesHandler().getMessageByID(message_id).json['Message']['likes'])
+
+    def getMessageDislikes(self, message_id):
+        return jsonify(Dislikes=MessagesHandler().getMessageByID(message_id).json['Message']['dislikes'])
+
+
+    def addMessageLike(self, message_id):
+        dao = MessagesDAO()
+        if not dao.getMessageByID(message_id):
+            return jsonify(Error="Message not found."), 404
+        else:
+            dao.addLike(message_id)
+            return jsonify(Status = "Message Like Added"), 200
+
+    def deleteMessageLike(self, message_id):
+        dao = MessagesDAO()
+        if not dao.getMessageByID(message_id):
+            return jsonify(Error="Message not found."), 404
+        else:
+            dao.deleteLike(message_id)
+            return jsonify(DeleteStatus = "Message Like Deleted"), 200
+
+    def addMessageDislike(self, message_id):
+        dao = MessagesDAO()
+        if not dao.getMessageByID(message_id):
+            return jsonify(Error="Message not found."), 404
+        else:
+            dao.addDislike(message_id)
+            return jsonify(Status = "Message Dislike Added"), 200
+
+    def deleteMessageDislike(self, message_id):
+        dao = MessagesDAO()
+        if not dao.getMessageByID(message_id):
+            return jsonify(Error="Message not found."), 404
+        else:
+            dao.deleteDislike(message_id)
+            return jsonify(DeleteStatus = "Message Dislike Deleted"), 200
