@@ -50,10 +50,38 @@ def getContactByID(cid):
 #     return handler.getAllMessages()
 
 
-@app.route('/kheApp/messages/<int:chid>')
+@app.route('/kheApp/messages/<int:chid>', methods=['GET', 'POST', 'DELETE'])
 def getMessageByChatID(chid):
-    handler = MessagesHandler()
-    return handler.getMessagesByChatID(chid)
+    if request.method == 'GET':
+        return MessagesHandler().getMessagesByChatID(chid)
+    #elif request.method == 'POST':
+    #    return MessagesHandler().updateMessagesByChatID(chid, request.args)
+    elif request.method == 'DELETE':
+        return MessagesHandler().deleteMessagesByChatID(chid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/kheApp/message/like/<int:message_id>', methods=['GET', 'PUT', 'DELETE'])
+def messageLikes(message_id):
+    if request.method == 'GET':
+        return MessagesHandler().getMessageLikes(message_id)
+    elif request.method == 'PUT':
+        return MessagesHandler().addMessageLike(message_id)
+    elif request.method == 'DELETE':
+        return MessagesHandler().deleteMessageLike(message_id)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/kheApp/message/dislike/<int:message_id>', methods=['GET', 'PUT', 'DELETE'])
+def messageDislikes(message_id):
+    if request.method == 'GET':
+        return MessagesHandler().getMessageDislikes(message_id)
+    elif request.method == 'PUT':
+        return MessagesHandler().addMessageDislike(message_id)
+    elif request.method == 'DELETE':
+        return MessagesHandler().deleteMessageDislike(message_id)
+    else:
+        return jsonify(Error="Method not allowed."), 405
 
 
 @app.route('/kheApp/chats', methods=['GET', 'POST'])
