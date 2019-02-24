@@ -228,6 +228,14 @@ class MessagesHandler:
         else:
             dao.delete(cid)
             return jsonify(DeleteStatus = "OK"), 200
+    
+    def deleteMessagesByID(self, cid):
+        dao = MessagesDAO()
+        if not dao.getMessagesByChatID(cid):
+            return jsonify(Error="Messages not found."), 404
+        else:
+            dao.delete(cid)
+            return jsonify(DeleteStatus = "OK"), 200
 
     def getMessageByID(self, id):
         dao = MessagesDAO()
@@ -241,19 +249,38 @@ class MessagesHandler:
     def getMessageLikes(self, message_id):
         return jsonify(Likes=MessagesHandler().getMessageByID(message_id).json['Message']['likes'])
 
+    def getMessageDislikes(self, message_id):
+        return jsonify(Dislikes=MessagesHandler().getMessageByID(message_id).json['Message']['dislikes'])
 
-    def likeMessage(self, message_id):
+
+    def addMessageLike(self, message_id):
         dao = MessagesDAO()
         if not dao.getMessageByID(message_id):
             return jsonify(Error="Message not found."), 404
         else:
-            dao.delete(message_id)
-            return jsonify(DeleteStatus = "OK"), 200
+            dao.addLike(message_id)
+            return jsonify(Status = "Message Like Added"), 200
 
-    def dislikeMessage(self, message_id):
+    def deleteMessageLike(self, message_id):
         dao = MessagesDAO()
         if not dao.getMessageByID(message_id):
             return jsonify(Error="Message not found."), 404
         else:
-            dao.delete(message_id)
-            return jsonify(DeleteStatus = "OK"), 200
+            dao.deleteLike(message_id)
+            return jsonify(DeleteStatus = "Message Like Deleted"), 200
+
+    def addMessageDislike(self, message_id):
+        dao = MessagesDAO()
+        if not dao.getMessageByID(message_id):
+            return jsonify(Error="Message not found."), 404
+        else:
+            dao.addDislike(message_id)
+            return jsonify(Status = "Message Dislike Added"), 200
+
+    def deleteMessageDislike(self, message_id):
+        dao = MessagesDAO()
+        if not dao.getMessageByID(message_id):
+            return jsonify(Error="Message not found."), 404
+        else:
+            dao.deleteDislike(message_id)
+            return jsonify(DeleteStatus = "Message Dislike Deleted"), 200

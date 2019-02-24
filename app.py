@@ -62,16 +62,28 @@ def getMessageByChatID(chid):
     else:
         return jsonify(Error="Method not allowed."), 405
 
-@app.route('/kheApp/messages/like/<int:message_id>', methods=['GET', 'POST', 'DELETE'])
+@app.route('/kheApp/message/like/<int:message_id>', methods=['GET', 'PUT', 'DELETE'])
 def messageLikes(message_id):
     if request.method == 'GET':
         return MessagesHandler().getMessageLikes(message_id)
-    elif request.method == 'POST':
-        return MessagesHandler().likeMessage(message_id)
+    elif request.method == 'PUT':
+        return MessagesHandler().addMessageLike(message_id)
     elif request.method == 'DELETE':
-        return MessagesHandler().dislikeMessage(message_id)
+        return MessagesHandler().deleteMessageLike(message_id)
     else:
         return jsonify(Error="Method not allowed."), 405
+
+@app.route('/kheApp/message/dislike/<int:message_id>', methods=['GET', 'PUT', 'DELETE'])
+def messageDislikes(message_id):
+    if request.method == 'GET':
+        return MessagesHandler().getMessageDislikes(message_id)
+    elif request.method == 'PUT':
+        return MessagesHandler().addMessageDislike(message_id)
+    elif request.method == 'DELETE':
+        return MessagesHandler().deleteMessageDislike(message_id)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
 
 @app.route('/kheApp/chats', methods=['GET', 'POST'])
 def getChats():

@@ -63,10 +63,10 @@ class ContactDAO:
 class ChatDAO:
     def __init__(self):
 
-        # CH = [chatid, ownerid, chatname]
-        CH1 = [1, 3, 'PLBois']
-        CH2 = [2, 1, 'Los traperos full']
-        CH3 = [3, 1, 'TestChat']
+        # CH = [chatid, chatname, ownerid]
+        CH1 = [1, 'PLBois', 3]
+        CH2 = [2, 'Los traperos full', 1]
+        CH3 = [3, 'TestChat', 1]
 
         self.data = []
         self.data.append(CH1)
@@ -148,4 +148,16 @@ class MessagesDAO:
         # self.conn.commit()
         # return cid
         return cid
+
+    def addLike(self, message_id):
+        return message_id
+
+    def deleteLike(self, message_id):
+        return message_id
+
+    def addDislike(self, message_id):
+        return message_id
+
+    def deleteDislike(self, message_id):
+        return message_id
 
