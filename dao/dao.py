@@ -113,6 +113,16 @@ class ChatDAO:
         # return cid
         return chid
 
+    def getMembers(self, chid):
+        # self.getChatByID(chid)
+        if chid == 1:
+            members = ['1', '2', '3']
+        elif chid == 2:
+            members = ['1', '2']
+        elif chid == 3:
+            members = ['1', '2', '3', '4', '5', '6']
+        return members
+
 
 class MessagesDAO:
     def __init__(self):

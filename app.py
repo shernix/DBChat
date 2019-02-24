@@ -108,6 +108,18 @@ def getChatsByID(chid):
         return jsonify(Error="Method not allowed."), 405
 
 
+@app.route('/kheApp/chats/<int:chid>/members', methods=['GET', 'PUT', 'DELETE'])
+def getChatMemebersByChatID(chid):
+    if request.method == 'GET':
+        return ChatHandler().getChatMembersByChatID(chid)
+    elif request.method == 'PUT':
+        return ChatHandler().addChatMember(chid, request.args)
+    elif request.method == 'DELETE':
+        return ChatHandler().deleteChatMember(chid, request.args)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+
 if __name__ == '__main__':
     app.run(debug=True)
 

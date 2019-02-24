@@ -160,6 +160,46 @@ class ChatHandler:
             mapped = self.mapToChatDict(result)
             return jsonify(Chat=mapped)
 
+    def getChatMembersByChatID(self, chid):
+        dao = ChatDAO()
+        result = dao.getChatByID(chid)
+        if result == None:
+            return jsonify(Error="CHAT NOT FOUND"), 404
+        else:
+            members = ChatDAO().getMembers(chid)
+            return jsonify(members=members)
+
+    def addChatMember(self, chid, args):
+        dao = ChatDAO()
+        result = dao.getChatByID(chid)
+        if result == None:
+            return jsonify(Error="CHAT NOT FOUND"), 404
+        else:
+            members = self.getChatMembersByChatID(chid)
+            mapped = []
+            for r in members.json['members']:
+                mapped.append(r)
+            if not mapped.__contains__(args.get('members')):
+                mapped.append(args.get('members'))
+            print(mapped)
+            return jsonify(members=mapped)
+
+    def deleteChatMember(self, chid, args):
+        dao = ChatDAO()
+        result = dao.getChatByID(chid)
+        if result == None:
+            return jsonify(Error="CHAT NOT FOUND"), 404
+        else:
+            members = self.getChatMembersByChatID(chid)
+            mapped = []
+            for r in members.json['members']:
+                mapped.append(r)
+            if mapped.__contains__(args.get('members')):
+                mapped.remove(args.get('members'))
+            print(mapped)
+            return jsonify(members=mapped)
+
+
     def searchChats(self, args):
         if len(args) > 1:
             #print(args)
