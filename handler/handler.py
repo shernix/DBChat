@@ -203,3 +203,26 @@ class MessagesHandler:
             for r in result:
                 mapped_result.append(self.mapToMessagesDict(r))
             return jsonify(Messages=mapped_result)
+
+    #********************************************************************* FIX THIS !!!
+    def postMessagesByChatID(self, args):
+        # cid = json['cid']
+        message = args.get('message')
+        user_id = args.get('user_id')
+        timestamp = args.get('timestamp')
+
+        if chid and message and user_id and timestamp:
+            dao = MessagesDAO()
+            cid = dao.insert(message, user_id, timestamp)
+            result = self.mapToContactAttributes(cid, message, user_id, timestamp)
+            return jsonify(Contact=result), 201
+        else:
+            return jsonify(Error="Unexpected attributes in post request"), 400
+
+    def deleteMessagesByChatID(self, cid):
+        dao = MessagesDAO()
+        if not dao.getMessagesByChatID(cid):
+            return jsonify(Error="Contact not found."), 404
+        else:
+            dao.delete(cid)
+            return jsonify(DeleteStatus = "OK"), 200

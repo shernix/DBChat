@@ -51,17 +51,24 @@ def getContactByID(cid):
 #     return handler.getAllMessages()
 
 
-@app.route('/kheApp/messages/<int:chid>')
+@app.route('/kheApp/messages/<int:chid>', methods=['GET', 'POST', 'DELETE'])
 def getMessageByChatID(chid):
-    handler = MessagesHandler()
-    return handler.getMessagesByChatID(chid)
+    if request.method == 'GET':
+        return MessagesHandler().getMessagesByChatID(chid)
+    elif request.method == 'POST':
+        return MessagesHandler().updateMessagesByChatID(chid, request.args)  # 'Updated contact!'
+    elif request.method == 'DELETE':
+        return MessagesHandler().deleteMessagesByChatID(chid)  # 'Deleted contact!'
+    else:
+        return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/kheApp/chats', methods=['GET', 'POST'])
+@app.route('/kheApp/chats', methods=['GET', 'POST', 'DELETE'])
 def getChats():
     if request.method == 'POST':
         print("REQUEST: ", request.json)
         return 'Chat created!'
+    
     else:
         if not request.args:
             return ChatHandler().getAllChats()

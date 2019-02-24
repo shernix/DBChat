@@ -118,4 +118,21 @@ class MessagesDAO:
             return None
         else:
             return result
+    
+    def insert(self, cusername, cfirstname, clastname, cemail, cphonenumber):
+        # cursor = self.conn.cursor()
+        # query = "insert into contacts(cusername, cfirstname, clastname, cemail, cphonenumber) values (%s, %s, %s, %s) returning cid;"
+        # cursor.execute(query, (cusername, cfirstname, clastname, cemail, cphonenumber))
+        # cid = cursor.fetchone()[0]
+        # self.conn.commit()
+        # return cid
+        return 7
+
+    def delete(self, cid):
+        # cursor = self.conn.cursor()
+        # query = "delete from contacts where cid = %s;"
+        # cursor.execute(query, (cid,))
+        # self.conn.commit()
+        # return cid
+        return cid
 
