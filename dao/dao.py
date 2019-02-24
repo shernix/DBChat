@@ -62,8 +62,7 @@ class ContactDAO:
 
 class ChatDAO:
     def __init__(self):
-
-        # CH = [chatid, chatname, chatadminid]
+        # CH = [chatid, chatname, chatadminid
         CH1 = [1, 'PLBois', 3]
         CH2 = [2, 'Los traperos full', 1]
         CH3 = [3, 'TestChat', 1]

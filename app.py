@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
 from handler.handler import ContactHandler, MessagesHandler, ChatHandler
 
-
 app = Flask(__name__)
 
 

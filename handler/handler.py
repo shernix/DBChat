@@ -149,7 +149,7 @@ class ChatHandler:
         mapped_result = []
         for r in result:
             mapped_result.append(self.mapToChatDict(r))
-        return jsonify(Contact=mapped_result)
+        return jsonify(Chat=mapped_result)
 
     def getChatByID(self, id):
         dao = ChatDAO()
@@ -209,7 +209,6 @@ class ChatHandler:
         else:
             dao.delete(chid)
             return jsonify(DeleteStatus = "OK"), 200
-
 
 
 ################################################################################################
