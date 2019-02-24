@@ -182,6 +182,9 @@ class MessagesHandler:
         result['message'] = row[1]
         result['user_id'] = row[2]
         result['timestamp'] = row[3]
+        result['message_id'] = row[4]
+        result['likes'] = row[5]
+        result['dislikes'] = row[6]
 
         return result
 
@@ -204,7 +207,6 @@ class MessagesHandler:
                 mapped_result.append(self.mapToMessagesDict(r))
             return jsonify(Messages=mapped_result)
 
-    #********************************************************************* FIX THIS !!!
     def postMessagesByChatID(self, args):
         # cid = json['cid']
         message = args.get('message')
@@ -222,7 +224,36 @@ class MessagesHandler:
     def deleteMessagesByChatID(self, cid):
         dao = MessagesDAO()
         if not dao.getMessagesByChatID(cid):
-            return jsonify(Error="Contact not found."), 404
+            return jsonify(Error="Messages not found."), 404
         else:
             dao.delete(cid)
+            return jsonify(DeleteStatus = "OK"), 200
+
+    def getMessageByID(self, id):
+        dao = MessagesDAO()
+        result = dao.getMessageByID(id)
+        if result == None:
+            return jsonify(Error="MESSAGE NOT FOUND"), 404
+        else:
+            mapped = self.mapToMessagesDict(result)
+            return jsonify(Message=mapped)
+
+    def getMessageLikes(self, message_id):
+        return jsonify(Likes=MessagesHandler().getMessageByID(message_id).json['Message']['likes'])
+
+
+    def likeMessage(self, message_id):
+        dao = MessagesDAO()
+        if not dao.getMessageByID(message_id):
+            return jsonify(Error="Message not found."), 404
+        else:
+            dao.delete(message_id)
+            return jsonify(DeleteStatus = "OK"), 200
+
+    def dislikeMessage(self, message_id):
+        dao = MessagesDAO()
+        if not dao.getMessageByID(message_id):
+            return jsonify(Error="Message not found."), 404
+        else:
+            dao.delete(message_id)
             return jsonify(DeleteStatus = "OK"), 200

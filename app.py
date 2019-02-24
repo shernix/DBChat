@@ -55,15 +55,25 @@ def getContactByID(cid):
 def getMessageByChatID(chid):
     if request.method == 'GET':
         return MessagesHandler().getMessagesByChatID(chid)
-    elif request.method == 'POST':
-        return MessagesHandler().updateMessagesByChatID(chid, request.args)  # 'Updated contact!'
+    #elif request.method == 'POST':
+    #    return MessagesHandler().updateMessagesByChatID(chid, request.args)  
     elif request.method == 'DELETE':
-        return MessagesHandler().deleteMessagesByChatID(chid)  # 'Deleted contact!'
+        return MessagesHandler().deleteMessagesByChatID(chid) 
     else:
         return jsonify(Error="Method not allowed."), 405
 
+@app.route('/kheApp/messages/like/<int:message_id>', methods=['GET', 'POST', 'DELETE'])
+def messageLikes(message_id):
+    if request.method == 'GET':
+        return MessagesHandler().getMessageLikes(message_id)
+    elif request.method == 'POST':
+        return MessagesHandler().likeMessage(message_id)
+    elif request.method == 'DELETE':
+        return MessagesHandler().dislikeMessage(message_id)
+    else:
+        return jsonify(Error="Method not allowed."), 405
 
-@app.route('/kheApp/chats', methods=['GET', 'POST', 'DELETE'])
+@app.route('/kheApp/chats', methods=['GET', 'POST'])
 def getChats():
     if request.method == 'POST':
         print("REQUEST: ", request.json)
