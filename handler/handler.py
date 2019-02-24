@@ -226,7 +226,19 @@ class MessagesHandler:
         result['message_id'] = row[4]
         result['likes'] = row[5]
         result['dislikes'] = row[6]
+        result['image'] = row[7]
+        return result
 
+    def mapToMessageAttributes(self, chid, message, user_id, timestamp, message_id, likes, dislikes, image):
+        result = {}
+        result['chid'] = chid
+        result['message'] = message
+        result['user_id'] = user_id
+        result['timestamp'] = timestamp
+        result['message_id'] = message_id
+        result['likes'] = likes
+        result['dislikes'] = dislikes
+        result['image'] = image
         return result
 
     def getAllMessages(self):
@@ -250,14 +262,23 @@ class MessagesHandler:
 
     def postMessagesByChatID(self, args):
         # cid = json['cid']
+        chid = args.get('chid')
         message = args.get('message')
         user_id = args.get('user_id')
         timestamp = args.get('timestamp')
+        likes = args.get('likes')
+        dislikes = args.get('dislikes')
+        image = args.get('image')
+        
+        if message == None:
+                message = ' '
+        if image == None:
+                image = ' '
 
-        if chid and message and user_id and timestamp:
+        if chid and message and user_id and timestamp and likes and dislikes and image:
             dao = MessagesDAO()
-            cid = dao.insert(message, user_id, timestamp)
-            result = self.mapToContactAttributes(cid, message, user_id, timestamp)
+            message_id = dao.insert(chid, message, user_id, timestamp, likes, dislikes, image)
+            result = self.mapToMessageAttributes(chid, message, user_id, timestamp, message_id, likes, dislikes, image)
             return jsonify(Contact=result), 201
         else:
             return jsonify(Error="Unexpected attributes in post request"), 400
