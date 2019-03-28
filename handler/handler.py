@@ -290,6 +290,7 @@ class MessagesHandler:
 
     def postMessagesByChatID(self, args):
         # cid = json['cid']
+        chid = args.get('chid')
         message = args.get('message')
         user_id = args.get('user_id')
         timestamp = args.get('timestamp')

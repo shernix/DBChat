@@ -13,38 +13,6 @@ class UsersDAO:
         self.data.append(U3)
         self.data.append(U4)
 
-    # def getChatsByUserId(self, id):
-    #     if id == 1 or id == 2:
-    #         T = []
-    #         T.append(['1', 'PLBois'])
-    #         T.append(['2', 'traperos'])
-    #         return T
-    #
-    #     elif id == 3:
-    #         return [['1', 'PLBois']]
-    #     else:
-    #         return []
-    #
-    # def getContactsByUserId(self, id):
-    #     if id == 1:
-    #         T = []
-    #         T.append(['2', 'edusanti'])
-    #         T.append(['3', 'javelez'])
-    #         return T
-    #     elif id == 2:
-    #         T = []
-    #         T.append(['1', 'diegodinero'])
-    #         T.append(['3', 'javelez'])
-    #         return T
-    #     elif id == 3:
-    #         T = []
-    #         T.append(['1', 'diegodinero'])
-    #         T.append(['2', 'edusanti'])
-    #         T.append(['4', 'pedro1'])
-    #         return T
-    #     elif id == 4:
-    #         T = []
-    #         T.append(['3', 'javelez'])
 
 
 
