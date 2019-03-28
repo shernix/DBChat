@@ -9,7 +9,7 @@ def index():
     return 'This is the home of the messaging app'
 
 
-@app.route('/login')
+@app.route('/login')                                    #hacerlo un post
 def login():
     return 'You cannot log in at the moment lol'
 
@@ -70,24 +70,24 @@ def getMessageByChatID(chid):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/kheApp/message/like/<int:message_id>', methods=['GET', 'PUT', 'DELETE'])
+@app.route('/kheApp/messages/like/<int:message_id>', methods=['GET', 'PUT', 'DELETE'])
 def messageLikes(message_id):
     if request.method == 'GET':
         return MessagesHandler().getMessageLikes(message_id)
     elif request.method == 'PUT':
-        return MessagesHandler().addMessageLike(message_id)
+        return MessagesHandler().addMessageLike(message_id)  #hacer un post, no put
     elif request.method == 'DELETE':
         return MessagesHandler().deleteMessageLike(message_id)
     else:
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/kheApp/message/dislike/<int:message_id>', methods=['GET', 'PUT', 'DELETE'])
+@app.route('/kheApp/messages/dislike/<int:message_id>', methods=['GET', 'PUT', 'DELETE'])
 def messageDislikes(message_id):
     if request.method == 'GET':
         return MessagesHandler().getMessageDislikes(message_id)
     elif request.method == 'PUT':
-        return MessagesHandler().addMessageDislike(message_id)
+        return MessagesHandler().addMessageDislike(message_id)  #hacer un post, no put
     elif request.method == 'DELETE':
         return MessagesHandler().deleteMessageDislike(message_id)
     else:
@@ -104,6 +104,14 @@ def getChats():
             return ChatHandler().getAllChats()
         else:
             return ChatHandler().searchChats(request.args)
+
+
+@app.route('/kheApp/messages/reply/<int:message_id>', methods=['POST'])
+def reply(message_id):
+    if request.method == 'POST':
+        return 'Reply to message posted'
+    else:
+        return jsonify(Error="Method not allowed."), 405
 
 
 @app.route('/kheApp/chats/<int:chid>', methods=['GET', 'PUT', 'DELETE'])
