@@ -9,9 +9,11 @@ def index():
     return 'This is the home of the messaging app'
 
 
-@app.route('/login')                                    #hacerlo un post
+@app.route('/login', methods=['POST'])
 def login():
-    return 'You cannot log in at the moment lol'
+    if request.method == 'POST':
+        return 'Login successful'
+    return jsonify(Error="Method not allowed."), 405
 
 
 @app.route('/kheApp/register', methods=['POST'])
@@ -22,9 +24,12 @@ def register():
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/kheApp/dashboard')
+@app.route('/kheApp/dashboard', methods=['GET'])
 def dashboard():
-    return 'statistics'
+    if request.method == 'GET':
+        return 'statistics'
+    else:
+        return jsonify(Error="Method not allowed."), 405
 
 
 @app.route('/kheApp/contacts', methods=['GET', 'POST'])
@@ -70,24 +75,24 @@ def getMessageByChatID(chid):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/kheApp/messages/like/<int:message_id>', methods=['GET', 'PUT', 'DELETE'])
+@app.route('/kheApp/messages/like/<int:message_id>', methods=['GET', 'POST', 'DELETE'])
 def messageLikes(message_id):
     if request.method == 'GET':
         return MessagesHandler().getMessageLikes(message_id)
-    elif request.method == 'PUT':
-        return MessagesHandler().addMessageLike(message_id)  #hacer un post, no put
+    elif request.method == 'POST':
+        return MessagesHandler().addMessageLike(message_id)  # hacer un post, no put
     elif request.method == 'DELETE':
         return MessagesHandler().deleteMessageLike(message_id)
     else:
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/kheApp/messages/dislike/<int:message_id>', methods=['GET', 'PUT', 'DELETE'])
+@app.route('/kheApp/messages/dislike/<int:message_id>', methods=['GET', 'POST', 'DELETE'])
 def messageDislikes(message_id):
     if request.method == 'GET':
         return MessagesHandler().getMessageDislikes(message_id)
-    elif request.method == 'PUT':
-        return MessagesHandler().addMessageDislike(message_id)  #hacer un post, no put
+    elif request.method == 'POST':
+        return MessagesHandler().addMessageDislike(message_id)  # hacer un post, no put
     elif request.method == 'DELETE':
         return MessagesHandler().deleteMessageDislike(message_id)
     else:
@@ -106,7 +111,7 @@ def getChats():
             return ChatHandler().searchChats(request.args)
 
 
-@app.route('/kheApp/messages/reply/<int:message_id>', methods=['POST'])
+@app.route('/kheApp/messages/reply/<int:message_id>', methods=['POST'])  # this should have a delete reply option imo
 def reply(message_id):
     if request.method == 'POST':
         return 'Reply to message posted'
@@ -126,11 +131,11 @@ def getChatsByID(chid):
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/kheApp/chats/<int:chid>/members', methods=['GET', 'PUT', 'DELETE'])
+@app.route('/kheApp/chats/<int:chid>/members', methods=['GET', 'POST', 'DELETE'])
 def getChatMemebersByChatID(chid):
     if request.method == 'GET':
         return ChatHandler().getChatMembersByChatID(chid)
-    elif request.method == 'PUT':
+    elif request.method == 'POST':                                                   # CHANGED to be a post
         return ChatHandler().addChatMember(chid, request.args)
     elif request.method == 'DELETE':
         return ChatHandler().deleteChatMember(chid, request.args)
