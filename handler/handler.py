@@ -71,22 +71,53 @@ class ContactHandler:
         else:
             return jsonify(Error="Malformed search string."), 400
 
-    def insertContactJson(self, form):
+    def insertContact(self, form):
         # print("form: ", form)
-        if form == None:
-            return jsonify(Error="Malformed post request"), 400
-        else:
+        if len(form) == 3:
+            firstname = form['firstname']
+            lastname = form['lastname']
+            email = None
+            phonenumber = None
+            if "email" in form:
+                email = form['email']
+                if email == '':
+                    return jsonify(Error="Malformed post request"), 400
+            elif "phonenumber" in form:
+                phonenumber = form['phonenumber']
+                if phonenumber == '':
+                    return jsonify(Error="Malformed post request"), 400
+            else:
+                return jsonify(Error="Malformed post request"), 400
+            if firstname and lastname:
+                if email:
+                    user = UserDAO().getUserIDOnlyByCredentialsEmail(firstname, lastname, email)
+                if phonenumber:
+                    user = UserDAO().getUserIDOnlyByCredentialsPhone(firstname, lastname, phonenumber)
+                if user == None:
+                    return jsonify(Error="User doesn't exist"), 400
+                cid = user[0]
+                dao =ContactDAO()
+                contact = dao.getContactByID(cid)
+                if contact == None:
+                    cid = dao.insert(cid)
+                    return self.getContactByID(cid)
+                else:
+                    return jsonify(Error="Contact already exists"), 400
+
+        if len(form) == 1:
             cid = form['id']
-            dao = ContactDAO()
-            contact = dao.getContactByID(cid)
-            user = UserDAO().getUserIDONLY(cid)
+            user = UserDAO().getUserIDOnly(cid)
             if user == None:
                 return jsonify(Error="User doesn't exist"), 400
+            dao =ContactDAO()
+            contact = dao.getContactByID(cid)
             if contact == None:
                 cid = dao.insert(cid)
                 return self.getContactByID(cid)
             else:
                 return jsonify(Error="Contact already exists"), 400
+        else:
+            return jsonify(Error="Malformed post request"), 400
 
 
     # def updateContact(self, cid, args):
@@ -435,23 +466,68 @@ class UserHandler:
         # print("form: ", form)
         if form == None:
             return jsonify(Error="Malformed post request"), 400
-        if form['password'] == '':
-            return jsonify(Error="Missing password"), 400
-        if form['username'] == '':
-            return jsonify(Error="Missing username"), 400
-        if form['firstname'] == '':
-            return jsonify(Error="Missing first name"), 400
-        if form['lastname'] == '':
-            return jsonify(Error="Missing last name"), 400
-        if UserDAO().validateUsername(form['username']) != None:
-            return jsonify(Error="Username taken"), 400
-        else:
-            username = form['username']
-            firstname = form['firstname']
-            lastname = form['lastname']
-            email = form['email']
-            phonenumber = form['phonenumber']
+
+        # if password is not in form or is empty
+        if "password" in form:
             password = form['password']
+            if password == '':
+                return jsonify(Error="Missing password"), 400
+        else:
+            return jsonify(Error="Malformed post request"), 400
+
+        # if username is not in form or is empty
+        if "username" in form:
+            username = form['username']
+            if username == '':
+                return jsonify(Error="Missing username"), 400
+        else:
+            return jsonify(Error="Malformed post request"), 400
+
+        # if firstname is not in form or is empty
+        if "firstname" in form:
+            firstname = form['firstname']
+            if firstname == '':
+                return jsonify(Error="Missing firstname"), 400
+        else:
+            return jsonify(Error="Malformed post request"), 400
+
+        # if lastname is not in form or is empty
+        if "lastname" in form:
+            lastname = form['lastname']
+            if lastname == '':
+                return jsonify(Error="Missing lastname"), 400
+        else:
+            return jsonify(Error="Malformed post request"), 400
+
+        # verify if email is not in form or left blank
+        if "email" in form:
+            email = form['email']
+            if email == '':
+                email = ' '
+        else:
+            email = ' '
+        if "phonenumber" in form:
+            phonenumber = form['phonenumber']
+            if phonenumber == '':
+                phonenumber = ' '
+        else:
+            phonenumber = ' '
+        if email == ' ' and phonenumber == ' ':
+            return jsonify(Error="Missing email or phone"), 400
+
+        # Validate email or phonenumber entered at registration
+        if email != ' ':
+            if UserDAO().validateEmail(email) != None:
+                return jsonify(Error="email taken"), 400
+        if phonenumber != ' ':
+            if UserDAO().validatePhone(phonenumber) != None:
+                return jsonify(Error="phonenumber taken"), 400
+        # OPTIONAL
+        # verify username is not taken
+        # if UserDAO().validateUsername(username) != None:
+        #     return jsonify(Error="Username taken"), 400
+
+        if password and username and firstname and lastname:
             dao = UserDAO()
             uid = dao.insert(username, firstname, lastname, email, phonenumber, password)
             return self.getUserByUserID(uid)

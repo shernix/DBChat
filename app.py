@@ -38,7 +38,7 @@ def dashboard():
 def contacts():
     if request.method == 'POST':
         print("REQUEST: ", request.form)
-        return ContactHandler().insertContactJson(request.form)  # 'Contact added!'
+        return ContactHandler().insertContact(request.form)  # 'Contact added!'
     else:
         if not request.args:
             return ContactHandler().getAllContacts()

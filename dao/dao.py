@@ -267,13 +267,35 @@ class UserDAO:
 
     # http://127.0.0.1:5000/kheApp/contacts?id=2
     # http://127.0.0.1:5000/kheApp/contacts?id=14
-    def getUserIDONLY(self, id):
+    def getUserIDOnly(self, id):
         cursor = self.conn.cursor()
         query = "select user_id " \
                     "from usr " \
                     "where usr.user_id = %s " \
                     "and usr.user_id <> %s;"
         cursor.execute(query, (id, tokenId,))
+        result = cursor.fetchone()
+        return result
+
+    # http://127.0.0.1:5000/kheApp/contacts
+    # firstname ::  testy
+    # lastname ::   tested
+    # email ::      test@gmail.com
+    def getUserIDOnlyByCredentialsEmail(self, firstname, lastname, email):
+        cursor = self.conn.cursor()
+        query = "select user_id from usr where first_name = %s and last_name = %s and email = %s;"
+        cursor.execute(query, (firstname, lastname, email,))
+        result = cursor.fetchone()
+        return result
+
+    # http://127.0.0.1:5000/kheApp/contacts
+    # firstname ::  testy
+    # lastname ::   tested
+    # phonenumber:: 7876666666
+    def getUserIDOnlyByCredentialsPhone(self, firstname, lastname, phonenumber):
+        cursor = self.conn.cursor()
+        query = "select user_id from usr where first_name = %s and last_name = %s and phone_number = %s;"
+        cursor.execute(query, (firstname, lastname, phonenumber,))
         result = cursor.fetchone()
         return result
 
@@ -290,5 +312,19 @@ class UserDAO:
         cursor = self.conn.cursor()
         query = "select user_id from usr where user_name = %s;"
         cursor.execute(query, (username,))
+        result = cursor.fetchone()
+        return result
+
+    def validateEmail(self, email):
+        cursor = self.conn.cursor()
+        query = "select user_id from usr where email = %s;"
+        cursor.execute(query, (email,))
+        result = cursor.fetchone()
+        return result
+
+    def validatePhone(self, phonenumber):
+        cursor = self.conn.cursor()
+        query = "select user_id from usr where phone_number = %s;"
+        cursor.execute(query, (phonenumber,))
         result = cursor.fetchone()
         return result

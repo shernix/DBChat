@@ -1,7 +1,7 @@
 -- This file contains the definitions of the tables used in the application.
 
 --user table
-create table usr(user_id serial primary key, first_name varchar(10), last_name varchar(10), email varchar(20), phone_number varchar(10), password varchar(20), user_name varchar(16));
+create table usr(user_id serial primary key, first_name varchar(10), last_name varchar(10), email varchar(30), phone_number varchar(10), password varchar(20), user_name varchar(16));
 
 --chat tables
 create table chat(chid serial primary key, chat_name varchar(15), user_id integer references usr(user_id));
