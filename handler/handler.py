@@ -72,14 +72,14 @@ class ContactHandler:
             return jsonify(Error="Malformed search string."), 400
 
     def insertContactJson(self, form):
-        print("form: ", form)
+        # print("form: ", form)
         if form == None:
             return jsonify(Error="Malformed post request"), 400
         else:
             cid = form['id']
             dao = ContactDAO()
             contact = dao.getContactByID(cid)
-            user = UserDAO().getUserByUserID(cid)
+            user = UserDAO().getUserIDONLY(cid)
             if user == None:
                 return jsonify(Error="User doesn't exist"), 400
             if contact == None:
@@ -384,3 +384,75 @@ class MessagesHandler:
         else:
             dao.deleteDislike(message_id)
             return jsonify(DeleteStatus = "Message Dislike Deleted"), 200
+
+
+################################################################################################
+#                                           USER HANDLER                                       #
+################################################################################################
+
+class UserHandler:
+
+    def mapToUserDict(self, row):
+        result = {}
+        result['uid'] = row[0]
+        result['username'] = row[1]
+        result['firstname'] = row[2]
+        result['lastname'] = row[3]
+        result['email'] = row[4]
+        result['phonenumber'] = row[5]
+        result['password'] = row[6]
+        return result
+
+    def mapToUserAttributes(self, uid, username, firstname, lastname, email, phonenumber, password):
+        result = {}
+        result['uid'] = uid
+        result['username'] = username
+        result['firstname'] = firstname
+        result['lastname'] = lastname
+        result['email'] = email
+        result['phonenumber'] = phonenumber
+        result['password'] = password
+        return result
+
+    def getAllUsers(self):
+        dao = UserDAO()
+        user_list = dao.getAllUsers()
+        mapped_result = []
+        for r in user_list:
+            mapped_result.append(self.mapToUserDict(r))
+        return jsonify(Contact=mapped_result)
+
+    def getUserByUserID(self, uid):
+        dao = UserDAO()
+        user = dao.getUserByID(uid)
+        if user == None:
+            return jsonify(Error="USER NOT FOUND"), 400
+        else:
+            mapped = self.mapToUserDict(user)
+            return jsonify(User=mapped)
+
+    def insertUser(self, form):
+        # print("form: ", form)
+        if form == None:
+            return jsonify(Error="Malformed post request"), 400
+        if form['password'] == '':
+            return jsonify(Error="Missing password"), 400
+        if form['username'] == '':
+            return jsonify(Error="Missing username"), 400
+        if form['firstname'] == '':
+            return jsonify(Error="Missing first name"), 400
+        if form['lastname'] == '':
+            return jsonify(Error="Missing last name"), 400
+        if UserDAO().validateUsername(form['username']) != None:
+            return jsonify(Error="Username taken"), 400
+        else:
+            username = form['username']
+            firstname = form['firstname']
+            lastname = form['lastname']
+            email = form['email']
+            phonenumber = form['phonenumber']
+            password = form['password']
+            dao = UserDAO()
+            uid = dao.insert(username, firstname, lastname, email, phonenumber, password)
+            return self.getUserByUserID(uid)
+

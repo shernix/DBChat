@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from handler.handler import ContactHandler, MessagesHandler, ChatHandler
+from handler.handler import ContactHandler, MessagesHandler, ChatHandler, UserHandler
 #  from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
@@ -20,7 +20,8 @@ def login():
 @app.route('/kheApp/register', methods=['POST'])
 def register():
     if request.method == 'POST':
-        return 'User Registered'
+        # print("REQUEST: ", request.form)
+        return UserHandler().insertUser(request.form)
     else:
         return jsonify(Error="Method not allowed."), 405
 

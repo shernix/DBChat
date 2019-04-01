@@ -16,7 +16,7 @@ create table contact(contacts integer references usr(user_id), contacted integer
 create table media(media_id serial primary key, mediaType char(5),  file varchar(50))
 
 --messages table
-create table message(message_id serial primary key, message varchar(140), time_stamp char(6), user_id integer references usr(user_id), chid integer references chat(chid), media_id integer references media(media_id));
+create table message(message_id serial primary key, message varchar(140), time_stamp timestamp, user_id integer references usr(user_id), chid integer references chat(chid), media_id integer references media(media_id));
 
 --reply messages table
 create table isReply(original integer references message(message_id), reply integer references message(message_id), primary key(original, reply)) ;

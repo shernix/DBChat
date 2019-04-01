@@ -236,6 +236,15 @@ class UserDAO:
                                                             pg_config['passwd'])
         self.conn = psycopg2._connect(connection_url)
 
+    def getAllUsers(self):
+        cursor = self.conn.cursor()
+        query = "select * from usr;"
+        cursor.execute(query, (tokenId,))
+        result = []
+        for row in cursor:
+            result.append(row)
+        return result
+
     def getAllUserID(self):
         cursor = self.conn.cursor()
         query = "select user_id " \
@@ -247,9 +256,18 @@ class UserDAO:
             result.append(row)
         return result
 
+    def getUserByID(self,id):
+        cursor = self.conn.cursor()
+        query = "select user_id, user_name, first_name, last_name, email, phone_number, password " \
+                    "from usr " \
+                    "where user_id = %s;"
+        cursor.execute(query, (id,))
+        result = cursor.fetchone()
+        return result
+
     # http://127.0.0.1:5000/kheApp/contacts?id=2
     # http://127.0.0.1:5000/kheApp/contacts?id=14
-    def getUserByUserID(self, id):
+    def getUserIDONLY(self, id):
         cursor = self.conn.cursor()
         query = "select user_id " \
                     "from usr " \
@@ -259,3 +277,18 @@ class UserDAO:
         result = cursor.fetchone()
         return result
 
+    def insert(self, username, firstname, lastname, email, phonenumber, password):
+        cursor = self.conn.cursor()
+        query = "insert into usr(user_name, first_name, last_name, email, phone_number, password) "\
+                "values (%s, %s, %s, %s, %s, %s) returning user_id;"
+        cursor.execute(query, (username, firstname, lastname, email, phonenumber, password,))
+        cid = cursor.fetchone()[0]
+        self.conn.commit()
+        return cid
+
+    def validateUsername(self, username):
+        cursor = self.conn.cursor()
+        query = "select user_id from usr where user_name = %s;"
+        cursor.execute(query, (username,))
+        result = cursor.fetchone()
+        return result
