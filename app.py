@@ -118,12 +118,12 @@ def messageDislikes(message_id):
 def getChats():
     if request.method == 'POST':
         print("REQUEST: ", request.method)
-        return ChatHandler().insertChat(request.args)  # 'Chat created!'
+        return ChatHandler().insertChat(request.form)  # 'Chat created!'
     else:
-        if not request.args:
+        if not request.form:
             return ChatHandler().getAllChats()
         else:
-            return ChatHandler().searchChats(request.args)
+            return ChatHandler().searchChats(request.form)
 
 
 @app.route('/kheApp/messages/reply/<int:message_id>', methods=['POST'])  # this should have a delete reply option imo
@@ -139,7 +139,7 @@ def getChatsByID(chid):
     if request.method == 'GET':
         return ChatHandler().getChatByID(chid)
     elif request.method == 'PUT':
-        return ChatHandler().updateChat(chid, request.args)  # 'Updated Chat!'
+        return ChatHandler().updateChat(chid, request.form)  # 'Updated Chat!'
     elif request.method == 'DELETE':
         return ChatHandler().deleteChat(chid)  # 'Deleted Chat!'
     else:
@@ -151,9 +151,9 @@ def getChatMemebersByChatID(chid):
     if request.method == 'GET':
         return ChatHandler().getChatMembersByChatID(chid)
     elif request.method == 'POST':                                                   # CHANGED to be a post
-        return ChatHandler().addChatMember(chid, request.args)
+        return ChatHandler().addChatMember(chid, request.form)
     elif request.method == 'DELETE':
-        return ChatHandler().deleteChatMember(chid, request.args)
+        return ChatHandler().deleteChatMember(chid, request.form)
     else:
         return jsonify(Error="Method not allowed."), 405
 

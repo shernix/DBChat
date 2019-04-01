@@ -1,7 +1,7 @@
 from config.dbconfig import pg_config
 import psycopg2
 
-tokenId = 1;
+tokenId = 1
 
 class ContactDAO:
     def __init__(self):
@@ -38,9 +38,6 @@ class ContactDAO:
         result = []
         for row in cursor:
             result.append(row)
-
-
-        print(tokenId)
         return result
 
     # http://127.0.0.1:5000/kheApp/contacts/2
@@ -97,66 +94,123 @@ class ContactDAO:
 
 class ChatDAO:
     def __init__(self):
-        # CH = [chatid, chatname, chatadminid
-        CH1 = [1, 'PLBois', 3]
-        CH2 = [2, 'Los traperos full', 1]
-        CH3 = [3, 'TestChat', 1]
-
-        self.data = []
-        self.data.append(CH1)
-        self.data.append(CH2)
-        self.data.append(CH3)
+        # # CH = [chatid, chatname, chatadminid
+        # CH1 = [1, 'PLBois', 3]
+        # CH2 = [2, 'Los traperos full', 1]
+        # CH3 = [3, 'TestChat', 1]
+        #
+        # self.data = []
+        # self.data.append(CH1)
+        # self.data.append(CH2)
+        # self.data.append(CH3)
+        connection_url = "dbname=%s user=%s password=%s" % (pg_config['dbname'],
+                                                            pg_config['user'],
+                                                            pg_config['passwd'])
+        self.conn = psycopg2._connect(connection_url)
 
     def getAllChats(self):
-        return self.data
+        cursor = self.conn.cursor()
+        query = "select chat.chid, chat.chat_name, chat.user_id from chat, member "\
+                "where chat.chid = member.chid and member.user_id = %s;"
+        cursor.execute(query, (tokenId,))
+        result = []
+        for row in cursor:
+            result.append(row)
+        return result
 
     def getChatByID(self, id):
-        for r in self.data:
-            if id == r[0]:
-                return r
-        return None
+        cursor = self.conn.cursor()
+        query = "select chat.chid, chat.chat_name, chat.user_id from chat, member "\
+                "where chat.chid = member.chid and member.user_id = %s and chat.chid = %s " \
+                "UNION "\
+                "select chat.chid, chat.chat_name, chat.user_id "\
+                "from chat "\
+                "where chid = %s and user_id = %s; "
+        cursor.execute(query, (tokenId, id, id, tokenId,))
+        result = cursor.fetchone()
+        return result
 
     def getChatsByChatName(self, chatname):
-        mapped_result = []
-        for r in self.data:
-            if chatname.lower() == r[2].lower():
-                mapped_result.append(r)
-        return mapped_result
+        chat_list = self.getAllChats()
+        print(chat_list)
+        result = []
+        for r in chat_list:
+            if chatname.lower() == r[1].lower():
+                result.append(r)
+        return result
 
-    def insert(self, chname, chadminid):
-        # cursor = self.conn.cursor()
-        # query = "insert into chats(chnamem chadminid) values (%s, %s) returning chid;"
-        # cursor.execute(query, (chname, chadminid))
-        # cid = cursor.fetchone()[0]
-        # self.conn.commit()
-        # return chid
-        return 3
 
-    def update(self, chid, chname, chadminid):
-        # cursor = self.conn.cursor()
-        # query = "update chats set chname = %s, cadminid = %s where chid = %s;"
-        # cursor.execute(query, (chname, chadminid, chid,))
-        # self.conn.commit()
-        # return cid
+    def insert(self, chname):
+        cursor = self.conn.cursor()
+        query = "insert into chat(chat_name, user_id) values (%s, %s) returning chid;"
+        cursor.execute(query, (chname, tokenId))
+        chid = cursor.fetchone()[0]
+        self.conn.commit()
+        return chid
+
+    def update(self, chid, chname):
+        cursor = self.conn.cursor()
+        query = "update chat set chat_name = %s where chid = %s;"
+        cursor.execute(query, (chname, chid,))
+        self.conn.commit()
         return chid
 
     def delete(self, chid):
-        # cursor = self.conn.cursor()
-        # query = "delete from chats where chid = %s;"
-        # cursor.execute(query, (cid,))
-        # self.conn.commit()
-        # return cid
+        cursor = self.conn.cursor()
+        query = "delete from chat where chid = %s and user_id = %s;"
+        cursor.execute(query, (chid, tokenId,))
+        self.conn.commit()
         return chid
 
+
     def getMembers(self, chid):
-        # self.getChatByID(chid)
-        if chid == 1:
-            members = ['1', '2', '3']
-        elif chid == 2:
-            members = ['1', '2']
-        elif chid == 3:
-            members = ['1', '2', '3', '4', '5', '6']
-        return members
+        cursor = self.conn.cursor()
+        query = "select usr.user_id, usr.user_name, usr.first_name, usr.last_name, usr.email, usr.phone_number "\
+                    "from member,usr "\
+                    "where member.user_id = usr.user_id "\
+                    "and chid = %s;"
+        cursor.execute(query, (chid,))
+        result = []
+        for row in cursor:
+            result.append(row)
+        return result
+
+    def insertMember(self, chid, contactID):
+        cursor = self.conn.cursor()
+        query = "insert into member(chid, user_id) values (%s, %s) returning user_id;"
+        cursor.execute(query, (chid, contactID,))
+        cid = cursor.fetchone()[0]
+        self.conn.commit()
+        return cid
+
+    def deleteMember(self, chid, contactID):
+        cursor = self.conn.cursor()
+        query = "delete from member where chid = %s and user_id = %s;"
+        cursor.execute(query, (chid, contactID,))
+        # cid = cursor.fetchone()[0]
+        self.conn.commit()
+        return contactID
+
+    def validateAdmin(self, chid):
+        cursor = self.conn.cursor()
+        query = "select user_id from chat where chid = %sand user_id = %s;"
+        cursor.execute(query, (chid, tokenId,))
+        result = cursor.fetchone()
+        return result
+
+    def isContactInChat(self, chid, contact):
+        cursor = self.conn.cursor()
+        query = "select usr.user_id, usr.user_name, usr.first_name, usr.last_name, usr.email, usr.phone_number "\
+                    "from member,usr "\
+                    "where member.user_id = usr.user_id "\
+                    "and chid = %s and member.user_id = %s;"
+        cursor.execute(query, (chid, contact, ))
+        result = []
+        for row in cursor:
+            result.append(row)
+        return result
+
+
 
 
 class MessagesDAO:
@@ -337,7 +391,6 @@ class UserDAO:
         query = "select user_id from usr where password = %s and email = %s;"
         cursor.execute(query, (password, email,))
         result = cursor.fetchone()
-        tokenId = result
         return result
 
     def loginByPhone(self, password, phonenumber):
@@ -345,5 +398,4 @@ class UserDAO:
         query = "select user_id from usr where password = %s and phone_number = %s;"
         cursor.execute(query, (password, phonenumber,))
         result = cursor.fetchone()
-        tokenId = result
         return result

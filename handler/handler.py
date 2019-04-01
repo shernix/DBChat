@@ -39,6 +39,7 @@ class ContactHandler:
     def getContactByID(self, id):
         dao = ContactDAO()
         result = dao.getContactByID(id)
+        print(id)
         if result == None:
             return jsonify(Error="CONTACT NOT FOUND"), 404
         else:
@@ -171,7 +172,7 @@ class ChatHandler:
         result['chadminid'] = chadminid
 
         return result
-
+    # done
     def getAllChats(self):
         dao = ChatDAO()
         result = dao.getAllChats()
@@ -179,7 +180,7 @@ class ChatHandler:
         for r in result:
             mapped_result.append(self.mapToChatDict(r))
         return jsonify(Chat=mapped_result)
-
+    # done
     def getChatByID(self, id):
         dao = ChatDAO()
         result = dao.getChatByID(id)
@@ -188,53 +189,52 @@ class ChatHandler:
         else:
             mapped = self.mapToChatDict(result)
             return jsonify(Chat=mapped)
-
+    # done
     def getChatMembersByChatID(self, chid):
         dao = ChatDAO()
         result = dao.getChatByID(chid)
+        members=[]
         if result == None:
             return jsonify(Error="CHAT NOT FOUND"), 404
         else:
-            members = ChatDAO().getMembers(chid)
+            for x in ChatDAO().getMembers(chid):
+                members.append(ContactHandler().mapToContactDict(x))
             return jsonify(members=members)
-
-    def addChatMember(self, chid, args):
+    # done
+    def addChatMember(self, chid, form):
         dao = ChatDAO()
         result = dao.getChatByID(chid)
+        contact = form['cid']
         if result == None:
             return jsonify(Error="CHAT NOT FOUND"), 404
         else:
-            members = self.getChatMembersByChatID(chid)
-            mapped = []
-            for r in members.json['members']:
-                mapped.append(r)
-            if not mapped.__contains__(args.get('members')):
-                mapped.append(args.get('members'))
-            print(mapped)
-            return jsonify(members=mapped)
-
-    def deleteChatMember(self, chid, args):
+            if dao.isContactInChat(chid, contact):
+                return 'Contact is already in chat'
+            else:
+                return ContactHandler().getContactByID(dao.insertMember(chid, contact))
+    # done
+    def deleteChatMember(self, chid, form):
         dao = ChatDAO()
         result = dao.getChatByID(chid)
+        contact = form['cid']
+        print(dao.isContactInChat(chid, contact))
         if result == None:
             return jsonify(Error="CHAT NOT FOUND"), 404
+        elif dao.validateAdmin(chid) == None:
+            return "You are not the admin of the chat!"
         else:
-            members = self.getChatMembersByChatID(chid)
-            mapped = []
-            for r in members.json['members']:
-                mapped.append(r)
-            if mapped.__contains__(args.get('members')):
-                mapped.remove(args.get('members'))
-            print(mapped)
-            return jsonify(members=mapped)
+            if len(dao.isContactInChat(chid, contact)) < 1:
+                return 'Contact is not in chat'
+            else:
+                return ContactHandler().getContactByID(dao.deleteMember(chid, contact))
 
-
-    def searchChats(self, args):
-        if len(args) > 1:
-            #print(args)
+    # done
+    def searchChats(self, form):
+        if len(form) > 1:
+            print(form)
             return jsonify(Error="Malformed search string."), 400
-        chatname = args.get("chatname")
-        print(chatname)
+        chatname = form["chatname"]
+        # print(chatname)
         if chatname:
             dao = ChatDAO()
             chat_list = dao.getChatsByChatName(chatname)
@@ -242,37 +242,44 @@ class ChatHandler:
             for row in chat_list:
                 result = self.mapToChatDict(row)
                 result_list.append(result)
-            return jsonify(Chas=result_list)
+            return jsonify(Chats=result_list)
         else:
             return jsonify(Error="Malformed search string."), 400
 
-    def insertChat(self, args):
-        chname = args.get('chname')
-        chadminid = 1  # args.get('chadminid')
-        if chname and chadminid:
-            dao = ChatDAO()
-            chid = dao.insert(chname, chadminid)
-            result = self.mapToChatAttributes(chid, chname, chadminid)
-            return jsonify(Chat=result), 201
-        else:
-            return jsonify(Error="Unexpected attributes in post request"), 400
+    def insertChat(self, form):
+        chname = form['chatname']
+        if form == None:
+            return jsonify(Error="Malformed search string."), 400
+        dao = ChatDAO()
+        chid = dao.insert(chname)
+        chat = dao.getChatByID(chid)
+        result = self.mapToChatAttributes(chat[0], chat[1], chat[2])
+        return jsonify(Chat=result), 201
 
-    def updateChat(self, chid, args):
+    # done
+    def updateChat(self, chid, form):
         dao = ChatDAO()
         if not dao.getChatByID(chid):
             return jsonify(Error="Chat not found."), 404
-        else:
-            chname = args.get('chname')
-            chadminid = 1  # placeholder
-            if chname and chadminid:
-                dao.update(chid, chname, chadminid)
-                result = self.mapToChatAttributes(chid, chname, chadminid)
-                return jsonify(Chat=result), 200
-            else:
-                return jsonify(Error="Unexpected attributes in update request"), 400
 
+        if form == None:
+            return jsonify(Error="Malformed search string."), 400
+
+        if dao.validateAdmin(chid) == None:
+            return "You are not the admin of the chat!"
+
+        chatname = form['chatname']
+        chid = dao.update(chid, chatname)
+        chat = dao.getChatByID(chid)
+        result = self.mapToChatAttributes(chat[0], chat[1], chat[2])
+        return jsonify(Chat=result), 200
+
+    # done
     def deleteChat(self, chid):
         dao = ChatDAO()
+        print(chid)
+        if dao.validateAdmin(chid) == None:
+            return "You are not the admin of the chat!"
         if not dao.getChatByID(chid):
             return jsonify(Error="Chat not found."), 404
         else:
