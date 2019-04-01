@@ -38,6 +38,9 @@ class ContactDAO:
         result = []
         for row in cursor:
             result.append(row)
+
+
+        print(tokenId)
         return result
 
     # http://127.0.0.1:5000/kheApp/contacts/2
@@ -327,4 +330,20 @@ class UserDAO:
         query = "select user_id from usr where phone_number = %s;"
         cursor.execute(query, (phonenumber,))
         result = cursor.fetchone()
+        return result
+
+    def loginByEmail(self, password, email):
+        cursor = self.conn.cursor()
+        query = "select user_id from usr where password = %s and email = %s;"
+        cursor.execute(query, (password, email,))
+        result = cursor.fetchone()
+        tokenId = result
+        return result
+
+    def loginByPhone(self, password, phonenumber):
+        cursor = self.conn.cursor()
+        query = "select user_id from usr where password = %s and phone_number = %s;"
+        cursor.execute(query, (password, phonenumber,))
+        result = cursor.fetchone()
+        tokenId = result
         return result

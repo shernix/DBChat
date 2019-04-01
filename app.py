@@ -1,6 +1,7 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 from handler.handler import ContactHandler, MessagesHandler, ChatHandler, UserHandler
 #  from flask_cors import CORS, cross_origin
+import os
 
 app = Flask(__name__)
 
@@ -10,10 +11,22 @@ def index():
     return 'This is the home of the messaging app'
 
 
-@app.route('/login', methods=['POST'])
+@app.route('/kheApp/login', methods=['POST'])
 def login():
     if request.method == 'POST':
-        return 'Login successful'
+        if UserHandler().loginUser(request.form) > 0:
+            session['logged_in'] = True
+            return 'Login successful'
+        else:
+            return 'Login unsuccessful'
+    return jsonify(Error="Method not allowed."), 405
+
+
+@app.route("/kheApp/logout", methods=['POST'])
+def logout():
+    if request.method == 'POST':
+        session['logged_in'] = False
+        return 'Logout successful'
     return jsonify(Error="Method not allowed."), 405
 
 
@@ -146,6 +159,7 @@ def getChatMemebersByChatID(chid):
 
 
 if __name__ == '__main__':
+    app.secret_key = os.urandom(12)
     app.run(debug=True)
 
 

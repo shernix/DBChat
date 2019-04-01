@@ -445,6 +445,40 @@ class UserHandler:
         result['password'] = password
         return result
 
+    def loginUser(self, form):
+        if form == None:
+            return jsonify(Error="Malformed post request"), 400
+
+        # if password is not in form or is empty
+        if "password" in form:
+            password = form['password']
+            if password == '':
+                return jsonify(Error="Missing password"), 400
+        else:
+            return jsonify(Error="Malformed post request (Did not include password)"), 400
+
+        # verify if email is not in form or left blank
+        if "email" in form:
+            email = form['email']
+            if email == '':
+                email = ' '
+        else:
+            email = ' '
+        if "phonenumber" in form:
+            phonenumber = form['phonenumber']
+            if phonenumber == '':
+                phonenumber = ' '
+        else:
+            phonenumber = ' '
+        if email == ' ' and phonenumber == ' ':
+            return jsonify(Error="Missing email or phone"), 400
+        dao = UserDAO()
+        if dao.loginByEmail(password, email) != None:
+            return 1
+        if dao.loginByPhone(password, phonenumber) != None:
+            return 1
+        return 0
+
     def getAllUsers(self):
         dao = UserDAO()
         user_list = dao.getAllUsers()
