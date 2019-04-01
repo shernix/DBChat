@@ -64,8 +64,9 @@ class ContactDAO:
                 result.append(r)
         return result
 
-    # http://127.0.0.1:5000/kheApp/contacts?id=2
-    # http://127.0.0.1:5000/kheApp/contacts?id=14
+    # http://127.0.0.1:5000/kheApp/contacts
+    # key: id   value: 2
+    # key: id   value: 5
     def insert(self, id):
         cursor = self.conn.cursor()
         query = "insert into contact(contacts, contacted) values (%s, %s) returning contacted;"

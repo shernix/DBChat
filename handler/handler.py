@@ -71,18 +71,22 @@ class ContactHandler:
         else:
             return jsonify(Error="Malformed search string."), 400
 
-    def insertContactJson(self, args):
-        cid = args.get('id')
-        dao = ContactDAO()
-        contact = dao.getContactByID(cid)
-        user = UserDAO().getUserByUserID(cid)
-        if user == None:
-            return jsonify(Error="User doesn't exist"), 400
-        if contact == None:
-            cid = dao.insert(cid)
-            return self.getContactByID(cid)
+    def insertContactJson(self, form):
+        print("form: ", form)
+        if form == None:
+            return jsonify(Error="Malformed post request"), 400
         else:
-            return jsonify(Error="Contact already exists"), 400
+            cid = form['id']
+            dao = ContactDAO()
+            contact = dao.getContactByID(cid)
+            user = UserDAO().getUserByUserID(cid)
+            if user == None:
+                return jsonify(Error="User doesn't exist"), 400
+            if contact == None:
+                cid = dao.insert(cid)
+                return self.getContactByID(cid)
+            else:
+                return jsonify(Error="Contact already exists"), 400
 
 
     # def updateContact(self, cid, args):

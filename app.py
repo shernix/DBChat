@@ -36,8 +36,8 @@ def dashboard():
 @app.route('/kheApp/contacts', methods=['GET', 'POST'])
 def contacts():
     if request.method == 'POST':
-        print("REQUEST: ", request.method)
-        return ContactHandler().insertContactJson(request.args)  # 'Contact added!'
+        print("REQUEST: ", request.form)
+        return ContactHandler().insertContactJson(request.form)  # 'Contact added!'
     else:
         if not request.args:
             return ContactHandler().getAllContacts()
