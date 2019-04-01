@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from handler.handler import ContactHandler, MessagesHandler, ChatHandler
+#  from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
 
@@ -44,12 +45,12 @@ def contacts():
             return ContactHandler().searchContacts(request.args)
 
 
-@app.route('/kheApp/contacts/<int:cid>', methods=['GET', 'PUT', 'DELETE'])
+@app.route('/kheApp/contacts/<int:cid>', methods=['GET', 'DELETE'])
 def getContactByID(cid):
     if request.method == 'GET':
         return ContactHandler().getContactByID(cid)
-    elif request.method == 'PUT':
-        return ContactHandler().updateContact(cid, request.args)  # 'Updated contact!'
+    # elif request.method == 'PUT':
+    #     return ContactHandler().updateContact(cid, request.args)  # 'Updated contact!'
     elif request.method == 'DELETE':
         return ContactHandler().deleteContact(cid)  # 'Deleted contact!'
     else:

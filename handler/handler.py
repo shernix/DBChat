@@ -1,5 +1,5 @@
 from flask import jsonify, request
-from dao.dao import ContactDAO, ChatDAO, MessagesDAO
+from dao.dao import ContactDAO, ChatDAO, MessagesDAO, UserDAO
 
 
 ################################################################################################
@@ -30,9 +30,9 @@ class ContactHandler:
 
     def getAllContacts(self):
         dao = ContactDAO()
-        result = dao.getAllContacts()
+        contact_list = dao.getAllContacts()
         mapped_result = []
-        for r in result:
+        for r in contact_list:
             mapped_result.append(self.mapToContactDict(r))
         return jsonify(Contact=mapped_result)
 
@@ -72,45 +72,39 @@ class ContactHandler:
             return jsonify(Error="Malformed search string."), 400
 
     def insertContactJson(self, args):
-        # cid = json['cid']
-        cusername = args.get('cusername')
-        cfirstname = args.get('cfirstname')
-        clastname = args.get('clastname')
-        cemail = args.get('cemail')
-        cphonenumber = args.get('cphonenumber')
-        if cemail == None:
-            cemail = 'empty'
-        if cphonenumber == None:
-            cphonenumber = 'empty'
-
-        if cusername and cfirstname and clastname and cemail and cphonenumber:
-            dao = ContactDAO()
-            cid = dao.insert(cusername, cfirstname, clastname, cemail, cphonenumber)
-            result = self.mapToContactAttributes(cid, cusername, cfirstname, clastname, cemail, cphonenumber)
-            return jsonify(Contact=result), 201
-        else:
-            return jsonify(Error="Unexpected attributes in post request"), 400
-
-    def updateContact(self, cid, args):
+        cid = args.get('id')
         dao = ContactDAO()
-        if not dao.getContactByID(cid):
-            return jsonify(Error="Contact not found."), 404
+        contact = dao.getContactByID(cid)
+        user = UserDAO().getUserByUserID(cid)
+        if user == None:
+            return jsonify(Error="User doesn't exist"), 400
+        if contact == None:
+            cid = dao.insert(cid)
+            return self.getContactByID(cid)
         else:
-            cusername = args.get('cusername')
-            cfirstname = args.get('cfirstname')
-            clastname = args.get('clastname')
-            cemail = args.get('cemail')
-            cphonenumber = args.get('cphonenumber')
-            if cemail == None:
-                cemail = 'empty'
-            if cphonenumber == None:
-                cphonenumber = 'empty'
-            if cusername and cfirstname and clastname and cemail and cphonenumber:
-                dao.update(cid, cusername, cfirstname, clastname, cemail, cphonenumber)
-                result = self.mapToContactAttributes(cid, cusername, cfirstname, clastname, cemail, cphonenumber)
-                return jsonify(Contact=result), 200
-            else:
-                return jsonify(Error="Unexpected attributes in update request"), 400
+            return jsonify(Error="Contact already exists"), 400
+
+
+    # def updateContact(self, cid, args):
+    #     dao = ContactDAO()
+    #     if not dao.getContactByID(cid):
+    #         return jsonify(Error="Contact not found."), 404
+    #     else:
+    #         cusername = args.get('cusername')
+    #         cfirstname = args.get('cfirstname')
+    #         clastname = args.get('clastname')
+    #         cemail = args.get('cemail')
+    #         cphonenumber = args.get('cphonenumber')
+    #         if cemail == None:
+    #             cemail = 'empty'
+    #         if cphonenumber == None:
+    #             cphonenumber = 'empty'
+    #         if cusername and cfirstname and clastname and cemail and cphonenumber:
+    #             dao.update(cid, cusername, cfirstname, clastname, cemail, cphonenumber)
+    #             result = self.mapToContactAttributes(cid, cusername, cfirstname, clastname, cemail, cphonenumber)
+    #             return jsonify(Contact=result), 200
+    #         else:
+    #             return jsonify(Error="Unexpected attributes in update request"), 400
 
     def deleteContact(self, cid):
         dao = ContactDAO()
