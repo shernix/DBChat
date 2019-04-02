@@ -158,6 +158,82 @@ def getChatMemebersByChatID(chid):
         return jsonify(Error="Method not allowed."), 405
 
 
+################################################################################################
+#                                         Dev Routes                                           #
+################################################################################################
+
+# @app.route('/kheApp/dev/messages/<int:chid>', methods=['GET', 'POST', 'DELETE'])
+
+@app.route('/kheApp/dev/messages', methods=['GET'])
+def getAllMessagesInSystem():
+    if request.method == 'GET':
+        return MessagesHandler().getAllMessages()
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+
+@app.route('/kheApp/dev/messages/likers/<int:message_id>', methods=['GET'])
+def getAllUsersWhoLiked(message_id):
+    if request.method == 'GET':
+        return MessagesHandler().getAllUsersWhoLiked(message_id)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+
+@app.route('/kheApp/dev/messages/dislikers/<int:message_id>', methods=['GET'])
+def getAllUsersWhoDisliked(message_id):
+    if request.method == 'GET':
+        return MessagesHandler().getAllUsersWhoDisliked(message_id)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+
+@app.route('/kheApp/dev/contacts/<int:user_id>', methods=['GET'])
+def contactsOfUser(user_id):
+    if request.method == 'GET':
+        return ContactHandler().getAllContactsOfUser(user_id)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+
+@app.route('/kheApp/dev/chats/<int:chid>/members', methods=['GET'])
+def getChatGroupSubscribers(chid):
+    if request.method == 'GET':
+        return ChatHandler().getChatGroupSubscribers(chid)
+
+
+@app.route('/kheApp/dev/users', methods=['GET'])
+def getAllUsersInSystem():
+    if request.method == 'GET':
+        return UserHandler().getAllUsers()
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+
+@app.route('/kheApp/dev/chats', methods=['GET'])
+def getChatsDev():
+    if request.method == 'GET':
+        return ChatHandler().getAllChatsDev()
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+
+@app.route('/kheApp/dev/chats/<int:chid>', methods=['GET'])
+def getChatsByIDDev(chid):
+    if request.method == 'GET':
+        return ChatHandler().getChatByIDDev(chid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+
+@app.route('/kheApp/dev/user', methods=['GET'])
+def getAllUsersInSystemByCredential():
+    if request.method == 'GET':
+        return UserHandler().getUser(request.form)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
     app.run(debug=True)

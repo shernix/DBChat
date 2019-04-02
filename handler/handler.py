@@ -150,6 +150,17 @@ class ContactHandler:
             dao.delete(cid)
             return jsonify(DeleteStatus = "OK"), 200
 
+    def getAllContactsOfUser(self, uid):
+        user = UserDAO().getUserByID(uid)
+        if user == None:
+            return jsonify(Error="USER NOT FOUND"), 400
+        dao = ContactDAO()
+        contact_list = dao.getAllContactsOfUser(uid)
+        mapped_result = []
+        for r in contact_list:
+            mapped_result.append(self.mapToContactDict(r))
+        return jsonify(Contact=mapped_result)
+
 
 ################################################################################################
 #                                         CHAT HANDLER                                         #
@@ -291,6 +302,38 @@ class ChatHandler:
             dao.delete(chid)
             return jsonify(DeleteStatus = "OK"), 200
 
+    def getChatGroupSubscribers(self, chid):
+        dao = ChatDAO()
+        result = dao.getAllChatSubscribers(chid)
+        print(result)
+        members=[]
+        if result == None:
+            return jsonify(Error="CHAT NOT FOUND"), 404
+        else:
+            dao = UserDAO()
+            for x in result:
+                user = dao.getUserByID(x[0])
+                members.append(UserHandler().mapToUserDict(user))
+            return jsonify(members=members)
+
+    def getAllChatsDev(self):
+        dao = ChatDAO()
+        result = dao.getAllChatsDev()
+        mapped_result = []
+        for r in result:
+            mapped_result.append(self.mapToChatDict(r))
+        return jsonify(Chat=mapped_result)
+
+    def getChatByIDDev(self, id):
+        dao = ChatDAO()
+        result = dao.getChatByIDDev(id)
+        if result == None:
+            return jsonify(Error="CHAT DOES NOT EXIST"), 404
+        else:
+            mapped = self.mapToChatDict(result)
+            return jsonify(Chat=mapped)
+
+
 
 ################################################################################################
 #                                        MESSAGES HANDLER                                      #
@@ -303,23 +346,23 @@ class MessagesHandler:
         result['chid'] = row[0]
         result['message'] = row[1]
         result['user_id'] = row[2]
-        result['timestamp'] = row[3]
+        result['time_stamp'] = row[3]
         result['message_id'] = row[4]
         result['likes'] = row[5]
         result['dislikes'] = row[6]
-        result['image'] = row[7]
+        result['media'] = row[7]
         return result
 
-    def mapToMessageAttributes(self, chid, message, user_id, timestamp, message_id, likes, dislikes, image):
+    def mapToMessageAttributes(self, chid, message, user_id, timestamp, message_id, likes, dislikes, media):
         result = {}
         result['chid'] = chid
         result['message'] = message
         result['user_id'] = user_id
-        result['timestamp'] = timestamp
+        result['time_stamp'] = timestamp
         result['message_id'] = message_id
         result['likes'] = likes
         result['dislikes'] = dislikes
-        result['image'] = image
+        result['media'] = media
         return result
 
     def getAllMessages(self):
@@ -329,13 +372,16 @@ class MessagesHandler:
         for r in result:
             mapped_result.append(self.mapToMessagesDict(r))
         return jsonify(Messages=mapped_result)
-
+    # done
     def getMessagesByChatID(self, id):
         dao = MessagesDAO()
         result = dao.getMessagesByChatID(id)
         mapped_result = []
         if result == None:
             return jsonify(Error="MESSAGE NOT FOUND"), 404
+        chat = ChatDAO().getChatByID(id)
+        if chat == None:
+            return jsonify(Error="CHAT NOT FOUND"), 404
         else:
             for r in result:
                 mapped_result.append(self.mapToMessagesDict(r))
@@ -388,13 +434,20 @@ class MessagesHandler:
         else:
             mapped = self.mapToMessagesDict(result)
             return jsonify(Message=mapped)
-
+    # done
     def getMessageLikes(self, message_id):
-        return jsonify(Likes=MessagesHandler().getMessageByID(message_id).json['Message']['likes'])
-
+        dao = MessagesDAO()
+        if not dao.getMessageByID(message_id):
+            return jsonify(Error="Message not found."), 404
+        else:
+            return jsonify(Likes=MessagesDAO().getMessageLikes(message_id))
+    # done
     def getMessageDislikes(self, message_id):
-        return jsonify(Dislikes=MessagesHandler().getMessageByID(message_id).json['Message']['dislikes'])
-
+        dao = MessagesDAO()
+        if not dao.getMessageByID(message_id):
+            return jsonify(Error="Message not found."), 404
+        else:
+            return jsonify(Dislikes=MessagesDAO().getMessageDislikes(message_id))
 
     def addMessageLike(self, message_id):
         dao = MessagesDAO()
@@ -427,6 +480,29 @@ class MessagesHandler:
         else:
             dao.deleteDislike(message_id)
             return jsonify(DeleteStatus = "Message Dislike Deleted"), 200
+    # done
+    def getAllUsersWhoLiked(self, message_id):
+        dao = MessagesDAO()
+        if not dao.getMessageByID(message_id):
+            return jsonify(Error="Message not found."), 404
+        else:
+            list = dao.getAllUsersWhoLiked(message_id)
+            mapped_result = []
+            for r in list:
+                mapped_result.append(ContactHandler().mapToContactDict(r))
+            return jsonify(Likers=mapped_result)
+    # done
+    def getAllUsersWhoDisliked(self, message_id):
+        dao = MessagesDAO()
+        if not dao.getMessageByID(message_id):
+            return jsonify(Error="Message not found."), 404
+        else:
+            list = dao.getAllUsersWhoDisliked(message_id)
+            mapped_result = []
+            for r in list:
+                mapped_result.append(ContactHandler().mapToContactDict(r))
+            return jsonify(Dislikers=mapped_result)
+
 
 
 ################################################################################################
@@ -497,7 +573,7 @@ class UserHandler:
         mapped_result = []
         for r in user_list:
             mapped_result.append(self.mapToUserDict(r))
-        return jsonify(Contact=mapped_result)
+        return jsonify(User=mapped_result)
 
     def getUserByUserID(self, uid):
         dao = UserDAO()
@@ -507,6 +583,40 @@ class UserHandler:
         else:
             mapped = self.mapToUserDict(user)
             return jsonify(User=mapped)
+
+    def getUser(self, form):
+        if form == None:
+            return jsonify(Error="Malformed post request"), 400
+        if "user_id" in form:
+            user_id = form['user_id']
+            if user_id == '':
+                user_id = ' '
+        else:
+            user_id = ' '
+        if "username" in form:
+            username = form['username']
+            if username == '':
+                username = ' '
+        else:
+            username = ' '
+        if user_id == ' ' and username == ' ':
+            return jsonify(Error="Missing email or phone"), 400
+
+        if username != ' ':
+            dao = UserDAO()
+            user_list = dao.getAllUsersByUsername(username)
+            mapped_result = []
+            print(user_list)
+            for r in user_list:
+                user = dao.getUserByID(r)
+                mapped_result.append(self.mapToUserDict(user))
+            return jsonify(User=mapped_result)
+
+        if user_id != ' ':
+            return self.getUserByUserID(user_id)
+        else:
+            return jsonify(Error="Malformed post request"), 400
+
 
     def insertUser(self, form):
         # print("form: ", form)
