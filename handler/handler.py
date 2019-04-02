@@ -278,11 +278,16 @@ class ChatHandler:
     def deleteChat(self, chid):
         dao = ChatDAO()
         print(chid)
-        if dao.validateAdmin(chid) == None:
-            return "You are not the admin of the chat!"
         if not dao.getChatByID(chid):
             return jsonify(Error="Chat not found."), 404
+        if dao.validateAdmin(chid) == None:
+            return jsonify(Error="You are not the admin of the chat!"), 404
         else:
+            members = dao.getMembers(chid)
+            print(members)
+            for member in members:
+                print(member[0])
+                dao.deleteMember(chid, member[0])
             dao.delete(chid)
             return jsonify(DeleteStatus = "OK"), 200
 
