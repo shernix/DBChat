@@ -303,11 +303,11 @@ class MessagesHandler:
         result['chid'] = row[0]
         result['message'] = row[1]
         result['user_id'] = row[2]
-        result['timestamp'] = row[3]
+        result['time_stamp'] = row[3]
         result['message_id'] = row[4]
         result['likes'] = row[5]
         result['dislikes'] = row[6]
-        result['image'] = row[7]
+        result['media'] = row[7]
         return result
 
     def mapToMessageAttributes(self, chid, message, user_id, timestamp, message_id, likes, dislikes, image):
@@ -315,11 +315,11 @@ class MessagesHandler:
         result['chid'] = chid
         result['message'] = message
         result['user_id'] = user_id
-        result['timestamp'] = timestamp
+        result['time_stamp'] = timestamp
         result['message_id'] = message_id
         result['likes'] = likes
         result['dislikes'] = dislikes
-        result['image'] = image
+        result['media'] = image
         return result
 
     def getAllMessages(self):
@@ -346,10 +346,10 @@ class MessagesHandler:
         chid = args.get('chid')
         message = args.get('message')
         user_id = args.get('user_id')
-        timestamp = args.get('timestamp')
+        timestamp = args.get('time_stamp')
         likes = args.get('likes')
         dislikes = args.get('dislikes')
-        image = args.get('image')
+        image = args.get('media')
         
         if message == None:
                 message = ' '

@@ -1,10 +1,11 @@
 from flask import Flask, request, jsonify, session
 from handler.handler import ContactHandler, MessagesHandler, ChatHandler, UserHandler
-#  from flask_cors import CORS, cross_origin
+from flask_cors import CORS, cross_origin
 import os
 
 app = Flask(__name__)
-
+# Apply CORS to this app
+CORS(app)
 
 @app.route('/')
 def index():
