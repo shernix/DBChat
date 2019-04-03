@@ -22,7 +22,7 @@ create table message(message_id serial primary key, message varchar(140), time_s
 create table isReply(original integer references message(message_id), reply integer references message(message_id), primary key(original, reply)) ;
 
 --like or dislike table
-create table react(user_id integer references usr(user_id), message_id integer references message(message_id), primary key(user_id, message_id), reaction varchar(7));
+create table react(user_id integer references usr(user_id), message_id integer references message(message_id), primary key(user_id, message_id), reaction varchar(7), time_stamp timestamp);
 
 --hashtag table
 create table hashtag(tag_id serial primary key, hashtag varchar(30));

@@ -369,6 +369,18 @@ class MessagesHandler:
         result['username'] = username
         return result
 
+    # this is only used for getting the users who liked a message so it includes a time_stamp
+    def mapToUserReactWithTimestamp(self, row):
+        result = {}
+        result['cid'] = row[0]
+        result['cusername'] = row[1]
+        result['cfirstname'] = row[2]
+        result['clastname'] = row[3]
+        result['cemail'] = row[4]
+        result['cphonenumber'] = row[5]
+        result['time_stamp'] = row[6]
+        return result
+
     def getAllMessages(self):
         dao = MessagesDAO()
         result = dao.getAllMessages()
@@ -503,7 +515,7 @@ class MessagesHandler:
             list = dao.getAllUsersWhoLiked(message_id)
             mapped_result = []
             for r in list:
-                mapped_result.append(ContactHandler().mapToContactDict(r))
+                mapped_result.append(self.mapToUserReactWithTimestamp(r))
             return jsonify(Likers=mapped_result)
     # done
     def getAllUsersWhoDisliked(self, message_id):
@@ -514,7 +526,7 @@ class MessagesHandler:
             list = dao.getAllUsersWhoDisliked(message_id)
             mapped_result = []
             for r in list:
-                mapped_result.append(ContactHandler().mapToContactDict(r))
+                mapped_result.append(self.mapToUserReactWithTimestamp(r))
             return jsonify(Dislikers=mapped_result)
 
 

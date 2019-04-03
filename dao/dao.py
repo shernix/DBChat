@@ -413,7 +413,7 @@ class MessagesDAO:
 
     def getAllUsersWhoLiked(self, message_id):
         cursor = self.conn.cursor()
-        query = "select usr.user_id, usr.user_name, usr.first_name, usr.last_name, usr.email, usr.phone_number "\
+        query = "select usr.user_id, usr.user_name, usr.first_name, usr.last_name, usr.email, usr.phone_number, react.time_stamp "\
                 "from (message left join react on message.message_id = react.message_id), usr "\
                 "where usr.user_id = react.user_id "\
                 "and reaction = 'like' "\
@@ -426,7 +426,7 @@ class MessagesDAO:
 
     def getAllUsersWhoDisliked(self, message_id):
         cursor = self.conn.cursor()
-        query = "select usr.user_id, usr.user_name, usr.first_name, usr.last_name, usr.email, usr.phone_number "\
+        query = "select usr.user_id, usr.user_name, usr.first_name, usr.last_name, usr.email, usr.phone_number, react.time_stamp "\
                 "from (message left join react on message.message_id = react.message_id), usr "\
                 "where usr.user_id = react.user_id "\
                 "and reaction = 'dislike' "\
