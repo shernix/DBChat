@@ -296,10 +296,11 @@ class MessagesDAO:
                 "where reaction = 'dislike' " \
                 "group by message.message_id) " \
                 "select message.chid, message.message, message.user_id, message.time_stamp, message.message_id, " \
-                "message_likes.likes, message_dislikes.dislikes, media.file " \
-                "from ((message left join message_likes on message_likes.mid = message.message_id) " \
+                "message_likes.likes, message_dislikes.dislikes, media.file, usr.user_name " \
+                "from (((message left join message_likes on message_likes.mid = message.message_id) " \
                 "left join message_dislikes on message_dislikes.mid = message.message_id) " \
-                "left join media on message.media_id = media.media_id " \
+                "left join media on message.media_id = media.media_id), usr " \
+                "where usr.user_id = message.user_id " \
                 "order by message.chid, message.time_stamp; "
         cursor.execute(query)
         result = []
@@ -321,11 +322,12 @@ class MessagesDAO:
                 "where reaction = 'dislike' " \
                 "group by message.message_id) " \
                 "select message.chid, message.message, message.user_id, message.time_stamp, message.message_id, " \
-                "message_likes.likes, message_dislikes.dislikes, media.file " \
-                "from ((message left join message_likes on message_likes.mid = message.message_id) " \
+                "message_likes.likes, message_dislikes.dislikes, media.file, usr.user_name " \
+                "from (((message left join message_likes on message_likes.mid = message.message_id) " \
                 "left join message_dislikes on message_dislikes.mid = message.message_id) " \
-                "left join media on message.media_id = media.media_id " \
-                "where message.chid = %s " \
+                "left join media on message.media_id = media.media_id), usr " \
+                "where usr.user_id = message.user_id " \
+                "and message.chid = %s" \
                 "order by message.chid, message.time_stamp; "
         cursor.execute(query, (id,))
         result = []

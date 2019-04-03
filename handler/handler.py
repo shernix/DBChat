@@ -351,9 +351,10 @@ class MessagesHandler:
         result['likes'] = row[5]
         result['dislikes'] = row[6]
         result['media'] = row[7]
+        result['username'] = row[8]
         return result
 
-    def mapToMessageAttributes(self, chid, message, user_id, timestamp, message_id, likes, dislikes, media):
+    def mapToMessageAttributes(self, chid, message, user_id, timestamp, message_id, likes, dislikes, media, username):
         result = {}
         result['chid'] = chid
         result['message'] = message
@@ -363,6 +364,7 @@ class MessagesHandler:
         result['likes'] = likes
         result['dislikes'] = dislikes
         result['media'] = media
+        result['username'] = username
         return result
 
     def getAllMessages(self):
