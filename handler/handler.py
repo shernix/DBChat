@@ -173,14 +173,16 @@ class ChatHandler:
         result['chid'] = row[0]
         result['chname'] = row[1]
         result['chadminid'] = row[2]
+        result['chadminname'] = row[3]
 
         return result
 
-    def mapToChatAttributes(self, chid, chname, chadminid):
+    def mapToChatAttributes(self, chid, chname, chadminid, chadminname):
         result = {}
         result['chid'] = chid
         result['chname'] = chname
         result['chadminid'] = chadminid
+        result['chadminname'] = chadminname
 
         return result
     # done
@@ -442,14 +444,24 @@ class MessagesHandler:
         if not dao.getMessageByID(message_id):
             return jsonify(Error="Message not found."), 404
         else:
-            return jsonify(Likes=MessagesDAO().getMessageLikes(message_id))
+            likes = dao.getMessageLikes(message_id)
+            result = {}
+            result['message_id'] = likes[0]
+            result['likes'] = likes[1]
+            print(result)
+            return jsonify(Likes=result)
     # done
     def getMessageDislikes(self, message_id):
         dao = MessagesDAO()
         if not dao.getMessageByID(message_id):
             return jsonify(Error="Message not found."), 404
         else:
-            return jsonify(Dislikes=MessagesDAO().getMessageDislikes(message_id))
+            dislikes = dao.getMessageLikes(message_id)
+            result = {}
+            result['message_id'] = dislikes[0]
+            result['dislikes'] = dislikes[1]
+            print(result)
+            return jsonify(Disikes=result)
 
     def addMessageLike(self, message_id):
         dao = MessagesDAO()

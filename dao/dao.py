@@ -244,7 +244,8 @@ class ChatDAO:
 
     def getAllChatsDev(self):
         cursor = self.conn.cursor()
-        query = "select * from chat;"
+        query = "select chat.chid, chat.chat_name, chat.user_id, usr.user_name from chat, usr " \
+                "where usr.user_id = chat.user_id;"
         cursor.execute(query)
         result = []
         for row in cursor:
@@ -253,12 +254,13 @@ class ChatDAO:
 
     def getChatByIDDev(self, id):
         cursor = self.conn.cursor()
-        query = "select chat.chid, chat.chat_name, chat.user_id from chat, member "\
-                "where chat.chid = member.chid and chat.chid = %s " \
-                "UNION "\
-                "select chat.chid, chat.chat_name, chat.user_id "\
-                "from chat "\
-                "where chid = %s; "
+        query = "select chat.chid, chat.chat_name, chat.user_id, usr.user_name from chat, member, usr "\
+                    "where chat.chid = member.chid and chat.chid = %s and usr.user_id = chat.user_id "\
+                    "UNION "\
+                    "select chat.chid, chat.chat_name, chat.user_id, usr.user_name "\
+                    "from chat, usr "\
+                    "where chid = %s "\
+                    "and usr.user_id = chat.user_id;"
         cursor.execute(query, (id, id,))
         result = cursor.fetchone()
         return result
@@ -360,10 +362,11 @@ class MessagesDAO:
 
     def getMessageLikes(self, id):
         cursor = self.conn.cursor()
-        query = "select count(reaction) as likes "\
+        query = "select message_id, count(reaction) as likes "\
                 "from react "\
                 "where reaction = 'like' "\
-                "and message_id = %s;"
+                "and message_id = %s " \
+                "group by message_id;"
         cursor.execute(query, (id,))
         result = cursor.fetchone()
         return result
