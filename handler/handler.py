@@ -1,9 +1,9 @@
 from flask import jsonify, request
-from dao.dao import ContactDAO, ChatDAO, MessagesDAO, UserDAO
+from dao.dao import ContactDAO, ChatDAO, MessagesDAO, UserDAO, StatisticsDao
 
 
 ################################################################################################
-#                                         CONTACT HANDLER                                      #
+#                                        CONTACT HANDLER                                       #
 ################################################################################################
 
 class ContactHandler:
@@ -336,9 +336,8 @@ class ChatHandler:
             return jsonify(Chat=mapped)
 
 
-
 ################################################################################################
-#                                        MESSAGES HANDLER                                      #
+#                                       MESSAGES HANDLER                                       #
 ################################################################################################
 
 class MessagesHandler:
@@ -530,9 +529,8 @@ class MessagesHandler:
             return jsonify(Dislikers=mapped_result)
 
 
-
 ################################################################################################
-#                                           USER HANDLER                                       #
+#                                         USER HANDLER                                         #
 ################################################################################################
 
 class UserHandler:
@@ -713,4 +711,45 @@ class UserHandler:
             dao = UserDAO()
             uid = dao.insert(username, firstname, lastname, email, phonenumber, password)
             return self.getUserByUserID(uid)
+
+
+################################################################################################
+#                                        DASHBOARD HANDLER                                     #
+################################################################################################
+
+class DashboardHandler:
+
+    def mapToTrendingTopicsDict(self, position, row):
+        result = {}
+        result['hashtag'] = row[0]
+        result['position'] = position
+        return result
+
+    def mapToDailyPostsDict(self, row):
+        result = {}
+        result['day'] = row[0]
+        result['total'] = row[1]
+        print(row)
+        return result
+
+    def getStatistics(self, stat):
+        dao = StatisticsDao()
+        if stat == 'TrendingTopics':
+            result = dao.getTrendingTopics()
+            mapped_result = []
+            i = 1
+            for r in result:
+                mapped_result.append(self.mapToTrendingTopicsDict(i, r))
+                i = i + 1
+            return jsonify(TrendingTopics = mapped_result)
+        if stat == 'NumberOfDailyPosts':
+            result = dao.getDailyPosts()
+            mapped_result = []
+            for r in result:
+                mapped_result.append(self.mapToDailyPostsDict(r))
+            return jsonify(DailyPosts=mapped_result)
+        else:
+            return jsonify(Error="Malformed search string."), 400
+
+
 

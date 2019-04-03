@@ -562,3 +562,37 @@ class UserDAO:
             result.append(row)
         return result
 
+
+class StatisticsDao:
+
+    def __init__(self):
+
+        connection_url = "dbname=%s user=%s password=%s" % (pg_config['dbname'],
+                                                            pg_config['user'],
+                                                            pg_config['passwd'])
+        self.conn = psycopg2._connect(connection_url)
+
+    def getTrendingTopics(self):
+        cursor = self.conn.cursor()
+        query = "select hashtag.hashtag, count(hashtag.tag_id) as position "\
+                "from hasHash, hashtag "\
+                "where hasHash.tag_id = hashtag.tag_id "\
+                "group by hashtag.tag_id "\
+                "order by count(hashtag.tag_id) desc;"
+        cursor.execute(query)
+        result = []
+        for row in cursor:
+            result.append(row)
+        return result
+
+    def getDailyPosts(self):
+        cursor = self.conn.cursor()
+        query = "select time_stamp::timestamp::date, count(time_stamp) as total "\
+                "from message "\
+                "group by time_stamp::timestamp::date;"
+        cursor.execute(query)
+        result = []
+        for row in cursor:
+            result.append(row)
+        return result
+

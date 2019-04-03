@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, session
-from handler.handler import ContactHandler, MessagesHandler, ChatHandler, UserHandler
+from handler.handler import ContactHandler, MessagesHandler, ChatHandler, UserHandler, DashboardHandler
 #  from flask_cors import CORS, cross_origin
 import os
 
@@ -39,10 +39,10 @@ def register():
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/kheApp/dashboard', methods=['GET'])
-def dashboard():
+@app.route('/kheApp/dashboard/<stat>', methods=['GET'])
+def dashboard(stat):
     if request.method == 'GET':
-        return 'statistics'
+        return DashboardHandler().getStatistics(stat)
     else:
         return jsonify(Error="Method not allowed."), 405
 
