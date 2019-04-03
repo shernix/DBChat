@@ -244,7 +244,8 @@ class ChatDAO:
 
     def getAllChatsDev(self):
         cursor = self.conn.cursor()
-        query = "select * from chat;"
+        query = "select chat.chid, chat.chat_name, chat.user_id, usr.user_name from chat, usr " \
+                "where usr.user_id = chat.user_id;"
         cursor.execute(query)
         result = []
         for row in cursor:
@@ -253,12 +254,13 @@ class ChatDAO:
 
     def getChatByIDDev(self, id):
         cursor = self.conn.cursor()
-        query = "select chat.chid, chat.chat_name, chat.user_id from chat, member "\
-                "where chat.chid = member.chid and chat.chid = %s " \
-                "UNION "\
-                "select chat.chid, chat.chat_name, chat.user_id "\
-                "from chat "\
-                "where chid = %s; "
+        query = "select chat.chid, chat.chat_name, chat.user_id, usr.user_name from chat, member, usr "\
+                    "where chat.chid = member.chid and chat.chid = %s and usr.user_id = chat.user_id "\
+                    "UNION "\
+                    "select chat.chid, chat.chat_name, chat.user_id, usr.user_name "\
+                    "from chat, usr "\
+                    "where chid = %s "\
+                    "and usr.user_id = chat.user_id;"
         cursor.execute(query, (id, id,))
         result = cursor.fetchone()
         return result
@@ -296,10 +298,11 @@ class MessagesDAO:
                 "where reaction = 'dislike' " \
                 "group by message.message_id) " \
                 "select message.chid, message.message, message.user_id, message.time_stamp, message.message_id, " \
-                "message_likes.likes, message_dislikes.dislikes, media.file " \
-                "from ((message left join message_likes on message_likes.mid = message.message_id) " \
+                "message_likes.likes, message_dislikes.dislikes, media.file, usr.user_name " \
+                "from (((message left join message_likes on message_likes.mid = message.message_id) " \
                 "left join message_dislikes on message_dislikes.mid = message.message_id) " \
-                "left join media on message.media_id = media.media_id " \
+                "left join media on message.media_id = media.media_id), usr " \
+                "where usr.user_id = message.user_id " \
                 "order by message.chid, message.time_stamp; "
         cursor.execute(query)
         result = []
@@ -321,11 +324,12 @@ class MessagesDAO:
                 "where reaction = 'dislike' " \
                 "group by message.message_id) " \
                 "select message.chid, message.message, message.user_id, message.time_stamp, message.message_id, " \
-                "message_likes.likes, message_dislikes.dislikes, media.file " \
-                "from ((message left join message_likes on message_likes.mid = message.message_id) " \
+                "message_likes.likes, message_dislikes.dislikes, media.file, usr.user_name " \
+                "from (((message left join message_likes on message_likes.mid = message.message_id) " \
                 "left join message_dislikes on message_dislikes.mid = message.message_id) " \
-                "left join media on message.media_id = media.media_id " \
-                "where message.chid = %s " \
+                "left join media on message.media_id = media.media_id), usr " \
+                "where usr.user_id = message.user_id " \
+                "and message.chid = %s" \
                 "order by message.chid, message.time_stamp; "
         cursor.execute(query, (id,))
         result = []
@@ -358,10 +362,11 @@ class MessagesDAO:
 
     def getMessageLikes(self, id):
         cursor = self.conn.cursor()
-        query = "select count(reaction) as likes "\
+        query = "select message_id, count(reaction) as likes "\
                 "from react "\
                 "where reaction = 'like' "\
-                "and message_id = %s;"
+                "and message_id = %s " \
+                "group by message_id;"
         cursor.execute(query, (id,))
         result = cursor.fetchone()
         return result
@@ -408,7 +413,7 @@ class MessagesDAO:
 
     def getAllUsersWhoLiked(self, message_id):
         cursor = self.conn.cursor()
-        query = "select usr.user_id, usr.user_name, usr.first_name, usr.last_name, usr.email, usr.phone_number "\
+        query = "select usr.user_id, usr.user_name, usr.first_name, usr.last_name, usr.email, usr.phone_number, react.time_stamp "\
                 "from (message left join react on message.message_id = react.message_id), usr "\
                 "where usr.user_id = react.user_id "\
                 "and reaction = 'like' "\
@@ -421,7 +426,7 @@ class MessagesDAO:
 
     def getAllUsersWhoDisliked(self, message_id):
         cursor = self.conn.cursor()
-        query = "select usr.user_id, usr.user_name, usr.first_name, usr.last_name, usr.email, usr.phone_number "\
+        query = "select usr.user_id, usr.user_name, usr.first_name, usr.last_name, usr.email, usr.phone_number, react.time_stamp "\
                 "from (message left join react on message.message_id = react.message_id), usr "\
                 "where usr.user_id = react.user_id "\
                 "and reaction = 'dislike' "\

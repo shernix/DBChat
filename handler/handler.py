@@ -173,14 +173,16 @@ class ChatHandler:
         result['chid'] = row[0]
         result['chname'] = row[1]
         result['chadminid'] = row[2]
+        result['chadminname'] = row[3]
 
         return result
 
-    def mapToChatAttributes(self, chid, chname, chadminid):
+    def mapToChatAttributes(self, chid, chname, chadminid, chadminname):
         result = {}
         result['chid'] = chid
         result['chname'] = chname
         result['chadminid'] = chadminid
+        result['chadminname'] = chadminname
 
         return result
     # done
@@ -351,9 +353,10 @@ class MessagesHandler:
         result['likes'] = row[5]
         result['dislikes'] = row[6]
         result['media'] = row[7]
+        result['username'] = row[8]
         return result
 
-    def mapToMessageAttributes(self, chid, message, user_id, timestamp, message_id, likes, dislikes, media):
+    def mapToMessageAttributes(self, chid, message, user_id, timestamp, message_id, likes, dislikes, media, username):
         result = {}
         result['chid'] = chid
         result['message'] = message
@@ -363,6 +366,19 @@ class MessagesHandler:
         result['likes'] = likes
         result['dislikes'] = dislikes
         result['media'] = media
+        result['username'] = username
+        return result
+
+    # this is only used for getting the users who liked a message so it includes a time_stamp
+    def mapToUserReactWithTimestamp(self, row):
+        result = {}
+        result['cid'] = row[0]
+        result['cusername'] = row[1]
+        result['cfirstname'] = row[2]
+        result['clastname'] = row[3]
+        result['cemail'] = row[4]
+        result['cphonenumber'] = row[5]
+        result['time_stamp'] = row[6]
         return result
 
     def getAllMessages(self):
@@ -440,14 +456,24 @@ class MessagesHandler:
         if not dao.getMessageByID(message_id):
             return jsonify(Error="Message not found."), 404
         else:
-            return jsonify(Likes=MessagesDAO().getMessageLikes(message_id))
+            likes = dao.getMessageLikes(message_id)
+            result = {}
+            result['message_id'] = likes[0]
+            result['likes'] = likes[1]
+            print(result)
+            return jsonify(Likes=result)
     # done
     def getMessageDislikes(self, message_id):
         dao = MessagesDAO()
         if not dao.getMessageByID(message_id):
             return jsonify(Error="Message not found."), 404
         else:
-            return jsonify(Dislikes=MessagesDAO().getMessageDislikes(message_id))
+            dislikes = dao.getMessageLikes(message_id)
+            result = {}
+            result['message_id'] = dislikes[0]
+            result['dislikes'] = dislikes[1]
+            print(result)
+            return jsonify(Disikes=result)
 
     def addMessageLike(self, message_id):
         dao = MessagesDAO()
@@ -489,7 +515,7 @@ class MessagesHandler:
             list = dao.getAllUsersWhoLiked(message_id)
             mapped_result = []
             for r in list:
-                mapped_result.append(ContactHandler().mapToContactDict(r))
+                mapped_result.append(self.mapToUserReactWithTimestamp(r))
             return jsonify(Likers=mapped_result)
     # done
     def getAllUsersWhoDisliked(self, message_id):
@@ -500,7 +526,7 @@ class MessagesHandler:
             list = dao.getAllUsersWhoDisliked(message_id)
             mapped_result = []
             for r in list:
-                mapped_result.append(ContactHandler().mapToContactDict(r))
+                mapped_result.append(self.mapToUserReactWithTimestamp(r))
             return jsonify(Dislikers=mapped_result)
 
 
