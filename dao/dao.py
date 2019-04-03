@@ -382,7 +382,7 @@ class MessagesDAO:
         return result
 
 
-    def insert(slef, chid, message, user_id, timestamp, likes, dislikes, image):
+    def insert(self, chid, message, user_id, timestamp, likes, dislikes, image):
         # cursor = self.conn.cursor()
         # query = "insert into contacts(cusername, cfirstname, clastname, cemail, cphonenumber) values (%s, %s, %s, %s) returning cid;"
         # cursor.execute(query, (cusername, cfirstname, clastname, cemail, cphonenumber))

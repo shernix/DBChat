@@ -407,10 +407,10 @@ class MessagesHandler:
         chid = args.get('chid')
         message = args.get('message')
         user_id = args.get('user_id')
-        timestamp = args.get('timestamp')
+        timestamp = args.get('time_stamp')
         likes = args.get('likes')
         dislikes = args.get('dislikes')
-        image = args.get('image')
+        image = args.get('media')
         
         if message == None:
                 message = ' '
