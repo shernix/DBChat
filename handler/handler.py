@@ -586,10 +586,10 @@ class UserHandler:
             return jsonify(Error="Missing email or phone"), 400
         dao = UserDAO()
         if dao.loginByEmail(password, email) != None:
-            return 1
+            return dao.loginByEmail(password, email)[0]
         if dao.loginByPhone(password, phonenumber) != None:
-            return 1
-        return 0
+            return dao.loginByPhone(password, phonenumber)[0]
+        return -1
 
     def getAllUsers(self):
         dao = UserDAO()

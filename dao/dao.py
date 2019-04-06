@@ -1,7 +1,14 @@
 from config.dbconfig import pg_config
 import psycopg2
 
-tokenId = 1
+tokenId = -1
+
+def globallyChangeTokenId(id):
+
+    global tokenId
+    tokenId = id
+    print(tokenId)
+
 
 class ContactDAO:
     def __init__(self):

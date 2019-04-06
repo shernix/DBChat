@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, session
 from handler.handler import ContactHandler, MessagesHandler, ChatHandler, UserHandler, DashboardHandler
 from flask_cors import CORS, cross_origin
 import os
+from dao.dao import globallyChangeTokenId
 
 app = Flask(__name__)
 CORS(app)
@@ -15,8 +16,12 @@ def index():
 @app.route('/kheApp/login', methods=['POST'])
 def login():
     if request.method == 'POST':
-        if UserHandler().loginUser(request.form) > 0:
+        id = UserHandler().loginUser(request.form)
+        print(id)
+
+        if id > 0:
             session['logged_in'] = True
+            globallyChangeTokenId(id)
             return 'Login successful'
         else:
             return 'Login unsuccessful'
@@ -27,6 +32,7 @@ def login():
 def logout():
     if request.method == 'POST':
         session['logged_in'] = False
+        globallyChangeTokenId(-1)
         return 'Logout successful'
     return jsonify(Error="Method not allowed."), 405
 
