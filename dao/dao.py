@@ -1,7 +1,14 @@
 from config.dbconfig import pg_config
 import psycopg2
 
-tokenId = 1
+tokenId = -1
+
+def globallyChangeTokenId(id):
+
+    global tokenId
+    tokenId = id
+    print(tokenId)
+
 
 class ContactDAO:
     def __init__(self):
@@ -244,7 +251,8 @@ class ChatDAO:
 
     def getAllChatsDev(self):
         cursor = self.conn.cursor()
-        query = "select * from chat;"
+        query = "select chat.chid, chat.chat_name, chat.user_id, usr.user_name from chat, usr " \
+                "where usr.user_id = chat.user_id;"
         cursor.execute(query)
         result = []
         for row in cursor:
@@ -253,12 +261,13 @@ class ChatDAO:
 
     def getChatByIDDev(self, id):
         cursor = self.conn.cursor()
-        query = "select chat.chid, chat.chat_name, chat.user_id from chat, member "\
-                "where chat.chid = member.chid and chat.chid = %s " \
-                "UNION "\
-                "select chat.chid, chat.chat_name, chat.user_id "\
-                "from chat "\
-                "where chid = %s; "
+        query = "select chat.chid, chat.chat_name, chat.user_id, usr.user_name from chat, member, usr "\
+                    "where chat.chid = member.chid and chat.chid = %s and usr.user_id = chat.user_id "\
+                    "UNION "\
+                    "select chat.chid, chat.chat_name, chat.user_id, usr.user_name "\
+                    "from chat, usr "\
+                    "where chid = %s "\
+                    "and usr.user_id = chat.user_id;"
         cursor.execute(query, (id, id,))
         result = cursor.fetchone()
         return result
@@ -296,10 +305,11 @@ class MessagesDAO:
                 "where reaction = 'dislike' " \
                 "group by message.message_id) " \
                 "select message.chid, message.message, message.user_id, message.time_stamp, message.message_id, " \
-                "message_likes.likes, message_dislikes.dislikes, media.file " \
-                "from ((message left join message_likes on message_likes.mid = message.message_id) " \
+                "message_likes.likes, message_dislikes.dislikes, media.file, usr.user_name " \
+                "from (((message left join message_likes on message_likes.mid = message.message_id) " \
                 "left join message_dislikes on message_dislikes.mid = message.message_id) " \
-                "left join media on message.media_id = media.media_id " \
+                "left join media on message.media_id = media.media_id), usr " \
+                "where usr.user_id = message.user_id " \
                 "order by message.chid, message.time_stamp; "
         cursor.execute(query)
         result = []
@@ -321,11 +331,12 @@ class MessagesDAO:
                 "where reaction = 'dislike' " \
                 "group by message.message_id) " \
                 "select message.chid, message.message, message.user_id, message.time_stamp, message.message_id, " \
-                "message_likes.likes, message_dislikes.dislikes, media.file " \
-                "from ((message left join message_likes on message_likes.mid = message.message_id) " \
+                "message_likes.likes, message_dislikes.dislikes, media.file, usr.user_name " \
+                "from (((message left join message_likes on message_likes.mid = message.message_id) " \
                 "left join message_dislikes on message_dislikes.mid = message.message_id) " \
-                "left join media on message.media_id = media.media_id " \
-                "where message.chid = %s " \
+                "left join media on message.media_id = media.media_id), usr " \
+                "where usr.user_id = message.user_id " \
+                "and message.chid = %s" \
                 "order by message.chid, message.time_stamp; "
         cursor.execute(query, (id,))
         result = []
@@ -358,10 +369,11 @@ class MessagesDAO:
 
     def getMessageLikes(self, id):
         cursor = self.conn.cursor()
-        query = "select count(reaction) as likes "\
+        query = "select message_id, count(reaction) as likes "\
                 "from react "\
                 "where reaction = 'like' "\
-                "and message_id = %s;"
+                "and message_id = %s " \
+                "group by message_id;"
         cursor.execute(query, (id,))
         result = cursor.fetchone()
         return result
@@ -377,7 +389,7 @@ class MessagesDAO:
         return result
 
 
-    def insert(slef, chid, message, user_id, timestamp, likes, dislikes, image):
+    def insert(self, chid, message, user_id, timestamp, likes, dislikes, image):
         # cursor = self.conn.cursor()
         # query = "insert into contacts(cusername, cfirstname, clastname, cemail, cphonenumber) values (%s, %s, %s, %s) returning cid;"
         # cursor.execute(query, (cusername, cfirstname, clastname, cemail, cphonenumber))
@@ -408,7 +420,7 @@ class MessagesDAO:
 
     def getAllUsersWhoLiked(self, message_id):
         cursor = self.conn.cursor()
-        query = "select usr.user_id, usr.user_name, usr.first_name, usr.last_name, usr.email, usr.phone_number "\
+        query = "select usr.user_id, usr.user_name, usr.first_name, usr.last_name, usr.email, usr.phone_number, react.time_stamp "\
                 "from (message left join react on message.message_id = react.message_id), usr "\
                 "where usr.user_id = react.user_id "\
                 "and reaction = 'like' "\
@@ -421,7 +433,7 @@ class MessagesDAO:
 
     def getAllUsersWhoDisliked(self, message_id):
         cursor = self.conn.cursor()
-        query = "select usr.user_id, usr.user_name, usr.first_name, usr.last_name, usr.email, usr.phone_number "\
+        query = "select usr.user_id, usr.user_name, usr.first_name, usr.last_name, usr.email, usr.phone_number, react.time_stamp "\
                 "from (message left join react on message.message_id = react.message_id), usr "\
                 "where usr.user_id = react.user_id "\
                 "and reaction = 'dislike' "\
@@ -552,6 +564,40 @@ class UserDAO:
         cursor = self.conn.cursor()
         query = "select user_id from usr where user_name = %s;"
         cursor.execute(query, (username,))
+        result = []
+        for row in cursor:
+            result.append(row)
+        return result
+
+
+class StatisticsDao:
+
+    def __init__(self):
+
+        connection_url = "dbname=%s user=%s password=%s" % (pg_config['dbname'],
+                                                            pg_config['user'],
+                                                            pg_config['passwd'])
+        self.conn = psycopg2._connect(connection_url)
+
+    def getTrendingTopics(self):
+        cursor = self.conn.cursor()
+        query = "select hashtag.hashtag, count(hashtag.tag_id) as position "\
+                "from hasHash, hashtag "\
+                "where hasHash.tag_id = hashtag.tag_id "\
+                "group by hashtag.tag_id "\
+                "order by count(hashtag.tag_id) desc;"
+        cursor.execute(query)
+        result = []
+        for row in cursor:
+            result.append(row)
+        return result
+
+    def getDailyPosts(self):
+        cursor = self.conn.cursor()
+        query = "select time_stamp::timestamp::date, count(time_stamp) as total "\
+                "from message "\
+                "group by time_stamp::timestamp::date;"
+        cursor.execute(query)
         result = []
         for row in cursor:
             result.append(row)

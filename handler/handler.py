@@ -1,9 +1,9 @@
 from flask import jsonify, request
-from dao.dao import ContactDAO, ChatDAO, MessagesDAO, UserDAO
+from dao.dao import ContactDAO, ChatDAO, MessagesDAO, UserDAO, StatisticsDao
 
 
 ################################################################################################
-#                                         CONTACT HANDLER                                      #
+#                                        CONTACT HANDLER                                       #
 ################################################################################################
 
 class ContactHandler:
@@ -173,14 +173,16 @@ class ChatHandler:
         result['chid'] = row[0]
         result['chname'] = row[1]
         result['chadminid'] = row[2]
+        result['chadminname'] = row[3]
 
         return result
 
-    def mapToChatAttributes(self, chid, chname, chadminid):
+    def mapToChatAttributes(self, chid, chname, chadminid, chadminname):
         result = {}
         result['chid'] = chid
         result['chname'] = chname
         result['chadminid'] = chadminid
+        result['chadminname'] = chadminname
 
         return result
     # done
@@ -334,9 +336,8 @@ class ChatHandler:
             return jsonify(Chat=mapped)
 
 
-
 ################################################################################################
-#                                        MESSAGES HANDLER                                      #
+#                                       MESSAGES HANDLER                                       #
 ################################################################################################
 
 class MessagesHandler:
@@ -351,9 +352,10 @@ class MessagesHandler:
         result['likes'] = row[5]
         result['dislikes'] = row[6]
         result['media'] = row[7]
+        result['username'] = row[8]
         return result
 
-    def mapToMessageAttributes(self, chid, message, user_id, timestamp, message_id, likes, dislikes, media):
+    def mapToMessageAttributes(self, chid, message, user_id, timestamp, message_id, likes, dislikes, media, username):
         result = {}
         result['chid'] = chid
         result['message'] = message
@@ -363,6 +365,22 @@ class MessagesHandler:
         result['likes'] = likes
         result['dislikes'] = dislikes
         result['media'] = media
+<<<<<<< HEAD
+=======
+        result['username'] = username
+        return result
+
+    # this is only used for getting the users who liked a message so it includes a time_stamp
+    def mapToUserReactWithTimestamp(self, row):
+        result = {}
+        result['cid'] = row[0]
+        result['cusername'] = row[1]
+        result['cfirstname'] = row[2]
+        result['clastname'] = row[3]
+        result['cemail'] = row[4]
+        result['cphonenumber'] = row[5]
+        result['time_stamp'] = row[6]
+>>>>>>> e910e94f34d20565d905bec07ec93a3fcc9cf4bf
         return result
 
     def getAllMessages(self):
@@ -440,14 +458,24 @@ class MessagesHandler:
         if not dao.getMessageByID(message_id):
             return jsonify(Error="Message not found."), 404
         else:
-            return jsonify(Likes=MessagesDAO().getMessageLikes(message_id))
+            likes = dao.getMessageLikes(message_id)
+            result = {}
+            result['message_id'] = likes[0]
+            result['likes'] = likes[1]
+            print(result)
+            return jsonify(Likes=result)
     # done
     def getMessageDislikes(self, message_id):
         dao = MessagesDAO()
         if not dao.getMessageByID(message_id):
             return jsonify(Error="Message not found."), 404
         else:
-            return jsonify(Dislikes=MessagesDAO().getMessageDislikes(message_id))
+            dislikes = dao.getMessageLikes(message_id)
+            result = {}
+            result['message_id'] = dislikes[0]
+            result['dislikes'] = dislikes[1]
+            print(result)
+            return jsonify(Disikes=result)
 
     def addMessageLike(self, message_id):
         dao = MessagesDAO()
@@ -489,7 +517,7 @@ class MessagesHandler:
             list = dao.getAllUsersWhoLiked(message_id)
             mapped_result = []
             for r in list:
-                mapped_result.append(ContactHandler().mapToContactDict(r))
+                mapped_result.append(self.mapToUserReactWithTimestamp(r))
             return jsonify(Likers=mapped_result)
     # done
     def getAllUsersWhoDisliked(self, message_id):
@@ -500,13 +528,12 @@ class MessagesHandler:
             list = dao.getAllUsersWhoDisliked(message_id)
             mapped_result = []
             for r in list:
-                mapped_result.append(ContactHandler().mapToContactDict(r))
+                mapped_result.append(self.mapToUserReactWithTimestamp(r))
             return jsonify(Dislikers=mapped_result)
 
 
-
 ################################################################################################
-#                                           USER HANDLER                                       #
+#                                         USER HANDLER                                         #
 ################################################################################################
 
 class UserHandler:
@@ -562,10 +589,10 @@ class UserHandler:
             return jsonify(Error="Missing email or phone"), 400
         dao = UserDAO()
         if dao.loginByEmail(password, email) != None:
-            return 1
+            return dao.loginByEmail(password, email)[0]
         if dao.loginByPhone(password, phonenumber) != None:
-            return 1
-        return 0
+            return dao.loginByPhone(password, phonenumber)[0]
+        return -1
 
     def getAllUsers(self):
         dao = UserDAO()
@@ -687,4 +714,45 @@ class UserHandler:
             dao = UserDAO()
             uid = dao.insert(username, firstname, lastname, email, phonenumber, password)
             return self.getUserByUserID(uid)
+
+
+################################################################################################
+#                                        DASHBOARD HANDLER                                     #
+################################################################################################
+
+class DashboardHandler:
+
+    def mapToTrendingTopicsDict(self, position, row):
+        result = {}
+        result['hashtag'] = row[0]
+        result['position'] = position
+        return result
+
+    def mapToDailyPostsDict(self, row):
+        result = {}
+        result['day'] = row[0]
+        result['total'] = row[1]
+        print(row)
+        return result
+
+    def getStatistics(self, stat):
+        dao = StatisticsDao()
+        if stat == 'TrendingTopics':
+            result = dao.getTrendingTopics()
+            mapped_result = []
+            i = 1
+            for r in result:
+                mapped_result.append(self.mapToTrendingTopicsDict(i, r))
+                i = i + 1
+            return jsonify(TrendingTopics = mapped_result)
+        if stat == 'NumberOfDailyPosts':
+            result = dao.getDailyPosts()
+            mapped_result = []
+            for r in result:
+                mapped_result.append(self.mapToDailyPostsDict(r))
+            return jsonify(DailyPosts=mapped_result)
+        else:
+            return jsonify(Error="Malformed search string."), 400
+
+
 
