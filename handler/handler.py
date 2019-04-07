@@ -365,8 +365,6 @@ class MessagesHandler:
         result['likes'] = likes
         result['dislikes'] = dislikes
         result['media'] = media
-<<<<<<< HEAD
-=======
         result['username'] = username
         return result
 
@@ -380,7 +378,6 @@ class MessagesHandler:
         result['cemail'] = row[4]
         result['cphonenumber'] = row[5]
         result['time_stamp'] = row[6]
->>>>>>> e910e94f34d20565d905bec07ec93a3fcc9cf4bf
         return result
 
     def getAllMessages(self):
