@@ -217,27 +217,40 @@ class ChatHandler:
     def addChatMember(self, chid, form):
         dao = ChatDAO()
         result = dao.getChatByID(chid)
-        contact = form['cid']
+
         if result == None:
             return jsonify(Error="CHAT NOT FOUND"), 404
         else:
+            if "cid" in form:
+                cid = form['cid']
+                if cid == '':
+                    return jsonify(Error="Missing contact id ('cid')"), 400
+            else:
+                return jsonify(Error="Malformed post request (Did not include contact id ('cid'))"), 400
+            contact = form['cid']
             if dao.isContactInChat(chid, contact):
-                return 'Contact is already in chat'
+                return jsonify(Error="Contact is already in chat"), 400
             else:
                 return ContactHandler().getContactByID(dao.insertMember(chid, contact))
     # done
     def deleteChatMember(self, chid, form):
         dao = ChatDAO()
         result = dao.getChatByID(chid)
+        if "cid" in form:
+            cid = form['cid']
+            if cid == '':
+                return jsonify(Error="Missing contact id ('cid')"), 400
+        else:
+            return jsonify(Error="Malformed post request (Did not include contact id ('cid'))"), 400
         contact = form['cid']
         print(dao.isContactInChat(chid, contact))
         if result == None:
             return jsonify(Error="CHAT NOT FOUND"), 404
         elif dao.validateAdmin(chid) == None:
-            return "You are not the admin of the chat!"
+            return jsonify(Error="You are not the admin of the chat!"), 400
         else:
             if len(dao.isContactInChat(chid, contact)) < 1:
-                return 'Contact is not in chat'
+                return jsonify(Error="Contact is not in chat"), 400
             else:
                 return ContactHandler().getContactByID(dao.deleteMember(chid, contact))
 
@@ -258,15 +271,21 @@ class ChatHandler:
             return jsonify(Chats=result_list)
         else:
             return jsonify(Error="Malformed search string."), 400
-
+    # done
     def insertChat(self, form):
-        chname = form['chatname']
         if form == None:
             return jsonify(Error="Malformed search string."), 400
+        if "chatname" in form:
+            chatname = form['chatname']
+            if chatname == '':
+                return jsonify(Error="Missing chatname"), 400
+        else:
+            return jsonify(Error="Malformed post request (Did not include chatname)"), 400
+        # chname = form['chatname']
         dao = ChatDAO()
-        chid = dao.insert(chname)
+        chid = dao.insert(chatname)
         chat = dao.getChatByID(chid)
-        result = self.mapToChatAttributes(chat[0], chat[1], chat[2])
+        result = self.mapToChatAttributes(chat[0], chat[1], chat[2], chat[3])
         return jsonify(Chat=result), 201
 
     # done
@@ -279,12 +298,12 @@ class ChatHandler:
             return jsonify(Error="Malformed search string."), 400
 
         if dao.validateAdmin(chid) == None:
-            return "You are not the admin of the chat!"
+            return jsonify(Error="You are not the admin of the chat!"), 400
 
         chatname = form['chatname']
         chid = dao.update(chid, chatname)
         chat = dao.getChatByID(chid)
-        result = self.mapToChatAttributes(chat[0], chat[1], chat[2])
+        result = self.mapToChatAttributes(chat[0], chat[1], chat[2], chat[3])
         return jsonify(Chat=result), 200
 
     # done
@@ -294,7 +313,7 @@ class ChatHandler:
         if not dao.getChatByID(chid):
             return jsonify(Error="Chat not found."), 404
         if dao.validateAdmin(chid) == None:
-            return jsonify(Error="You are not the admin of the chat!"), 404
+            return jsonify(Error="You are not the admin of the chat!"), 400
         else:
             members = dao.getMembers(chid)
             print(members)
@@ -379,7 +398,7 @@ class MessagesHandler:
         result['cphonenumber'] = row[5]
         result['time_stamp'] = row[6]
         return result
-
+    # done DEV
     def getAllMessages(self):
         dao = MessagesDAO()
         result = dao.getAllMessages()
@@ -389,58 +408,83 @@ class MessagesHandler:
         return jsonify(Messages=mapped_result)
     # done
     def getMessagesByChatID(self, id):
+
         dao = MessagesDAO()
         result = dao.getMessagesByChatID(id)
         mapped_result = []
         if result == None:
             return jsonify(Error="MESSAGE NOT FOUND"), 404
-        chat = ChatDAO().getChatByID(id)
-        if chat == None:
-            return jsonify(Error="CHAT NOT FOUND"), 404
+        # chat = ChatDAO().getChatByID(id)                      # comment these 3 lines to toggle dev ability
+        # if chat == None:
+        #     return jsonify(Error="CHAT NOT FOUND"), 404
         else:
             for r in result:
                 mapped_result.append(self.mapToMessagesDict(r))
             return jsonify(Messages=mapped_result)
-
-    def postMessagesByChatID(self, args):
+    # done
+    def postMessagesByChatID(self, form, chid):
         # cid = json['cid']
-        chid = args.get('chid')
-        message = args.get('message')
-        user_id = args.get('user_id')
-        timestamp = args.get('time_stamp')
-        likes = args.get('likes')
-        dislikes = args.get('dislikes')
-        image = args.get('media')
-        
-        if message == None:
-                message = ' '
-        if image == None:
-                image = ' '
+        # chid = form['chid']
 
-        if chid and message and user_id and timestamp and likes and dislikes and image:
+        if form == None:
+            return jsonify(Error="Malformed post request"), 400
+
+        # if password is not in form or is empty
+        if "message" in form:
+            message = form['message']
+            if message == '':
+                return jsonify(Error="Missing message"), 400
+        else:
+            return jsonify(Error="Malformed post request"), 400
+
+        # verify if email is not in form or left blank
+        if "media" in form:
+            media = form['media']
+            if media == '':
+                media = ' '
+        else:
+            media = ' '
+
+        if message == ' ' and media == ' ':
+            return jsonify(Error="Missing message or media"), 400
+        if (media == ' '):
             dao = MessagesDAO()
-            message_id = dao.insert(chid, message, user_id, timestamp, likes, dislikes, image)
-            result = self.mapToMessageAttributes(chid, message, user_id, timestamp, message_id, likes, dislikes, image)
-            return jsonify(Contact=result), 201
+            message_id = dao.insertWithoutMedia(chid, message)
+            # result = self.getMessageByID(message_id)
+            return message_id
         else:
-            return jsonify(Error="Unexpected attributes in post request"), 400
-
-    def deleteMessagesByChatID(self, cid):
+            dao = MessagesDAO()
+            media_id = dao.insertMedia(media)
+            message_id = dao.insert(chid, message, media_id)
+            # result = self.getMessageByID(message_id)
+            return message_id
+        # return jsonify(Error="Unexpected attributes in post request"), 400
+    # done
+    def postMessageReply(self, form, chid, original):
+        print(form)
+        message_id = self.postMessagesByChatID(form, chid)
+        print(message_id)
         dao = MessagesDAO()
-        if not dao.getMessagesByChatID(cid):
-            return jsonify(Error="Messages not found."), 404
-        else:
-            dao.delete(cid)
-            return jsonify(DeleteStatus = "OK"), 200
-    
-    def deleteMessagesByID(self, cid):
-        dao = MessagesDAO()
-        if not dao.getMessagesByChatID(cid):
-            return jsonify(Error="Messages not found."), 404
-        else:
-            dao.delete(cid)
-            return jsonify(DeleteStatus = "OK"), 200
+        dao.reply(original, message_id)
+        result = self.getMessageByID(message_id)
+        return result
 
+    # def deleteMessagesByChatID(self, cid):
+    #     dao = MessagesDAO()
+    #     if not dao.getMessagesByChatID(cid):
+    #         return jsonify(Error="Messages not found."), 404
+    #     else:
+    #         dao.delete(cid)
+    #         return jsonify(DeleteStatus = "OK"), 200
+    #
+    # def deleteMessagesByID(self, message_id):
+    #     dao = MessagesDAO()
+    #     if not dao.getMessagesByChatID(message_id):
+    #         return jsonify(Error="Messages not found."), 404
+    #     else:
+    #         dao.delete(message_id)
+    #         return jsonify(DeleteStatus = "OK"), 200
+    # done
     def getMessageByID(self, id):
         dao = MessagesDAO()
         result = dao.getMessageByID(id)
@@ -473,38 +517,45 @@ class MessagesHandler:
             result['dislikes'] = dislikes[1]
             print(result)
             return jsonify(Disikes=result)
-
+    # done
     def addMessageLike(self, message_id):
         dao = MessagesDAO()
         if not dao.getMessageByID(message_id):
             return jsonify(Error="Message not found."), 404
+        elif dao.validateReaction(message_id) != None:
+            return jsonify(Error="You already reacted."), 404
         else:
             dao.addLike(message_id)
             return jsonify(Status = "Message Like Added"), 200
-
-    def deleteMessageLike(self, message_id):
-        dao = MessagesDAO()
-        if not dao.getMessageByID(message_id):
-            return jsonify(Error="Message not found."), 404
-        else:
-            dao.deleteLike(message_id)
-            return jsonify(DeleteStatus = "Message Like Deleted"), 200
-
+    # done
     def addMessageDislike(self, message_id):
         dao = MessagesDAO()
         if not dao.getMessageByID(message_id):
             return jsonify(Error="Message not found."), 404
+        elif dao.validateReaction(message_id) != None:
+            return jsonify(Error="You already reacted."), 404
         else:
             dao.addDislike(message_id)
             return jsonify(Status = "Message Dislike Added"), 200
-
-    def deleteMessageDislike(self, message_id):
+    # done
+    def deleteMessageReaction(self, message_id):
         dao = MessagesDAO()
         if not dao.getMessageByID(message_id):
             return jsonify(Error="Message not found."), 404
+        elif dao.validateReaction(message_id) == None:
+            return jsonify(Error="You haven't reacted."), 404
         else:
-            dao.deleteDislike(message_id)
-            return jsonify(DeleteStatus = "Message Dislike Deleted"), 200
+            dao.deleteReaction(message_id)
+            return jsonify(DeleteStatus = "Message Reaction Deleted"), 200
+
+
+    # def deleteMessageDislike(self, message_id):
+    #     dao = MessagesDAO()
+    #     if not dao.getMessageByID(message_id):
+    #         return jsonify(Error="Message not found."), 404
+    #     else:
+    #         dao.deleteDislike(message_id)
+    #         return jsonify(DeleteStatus = "Message Dislike Deleted"), 200
     # done
     def getAllUsersWhoLiked(self, message_id):
         dao = MessagesDAO()
@@ -558,6 +609,7 @@ class UserHandler:
         return result
 
     def loginUser(self, form):
+        print(form)
         if form == None:
             return jsonify(Error="Malformed post request"), 400
 
@@ -586,9 +638,9 @@ class UserHandler:
             return jsonify(Error="Missing email or phone"), 400
         dao = UserDAO()
         if dao.loginByEmail(password, email) != None:
-            return dao.loginByEmail(password, email)[0]
+            return [dao.loginByEmail(password, email)[0]]
         if dao.loginByPhone(password, phonenumber) != None:
-            return dao.loginByPhone(password, phonenumber)[0]
+            return [dao.loginByPhone(password, phonenumber)[0]]
         return -1
 
     def getAllUsers(self):

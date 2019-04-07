@@ -16,12 +16,14 @@ def index():
 @app.route('/kheApp/login', methods=['POST'])
 def login():
     if request.method == 'POST':
+        if not request.form:
+            return jsonify(Error="Missing form"), 405
         id = UserHandler().loginUser(request.form)
-        print(id)
-
-        if id > 0:
+        if len(id) > 1:
+            return jsonify(Error="Missing form"), 405
+        if id[0] > 0:
             session['logged_in'] = True
-            globallyChangeTokenId(id)
+            globallyChangeTokenId(id[0])
             return 'Login successful'
         else:
             return 'Login unsuccessful'
@@ -58,7 +60,10 @@ def dashboard(stat):
 def contacts():
     if request.method == 'POST':
         print("REQUEST: ", request.form)
-        return ContactHandler().insertContact(request.form)  # 'Contact added!'
+        if not request.form:
+            return jsonify(Error="Missing form"), 405
+        else:
+            return ContactHandler().insertContact(request.form)  # 'Contact added!'
     else:
         if not request.args:
             return ContactHandler().getAllContacts()
@@ -90,9 +95,12 @@ def getMessageByChatID(chid):
     if request.method == 'GET':
         return MessagesHandler().getMessagesByChatID(chid)
     elif request.method == 'POST':
-        return MessagesHandler().postMessagesByChatID(request.args)
-    elif request.method == 'DELETE':
-        return MessagesHandler().deleteMessagesByChatID(chid)
+        if not request.form:
+            return jsonify(Error="Missing form"), 405
+        else:
+            return MessagesHandler().getMessageByID(MessagesHandler().postMessagesByChatID(request.form, chid))
+    # elif request.method == 'DELETE':
+    #     return MessagesHandler().deleteMessagesByID(chid)
     else:
         return jsonify(Error="Method not allowed."), 405
 
@@ -104,7 +112,7 @@ def messageLikes(message_id):
     elif request.method == 'POST':
         return MessagesHandler().addMessageLike(message_id)  # hacer un post, no put
     elif request.method == 'DELETE':
-        return MessagesHandler().deleteMessageLike(message_id)
+        return MessagesHandler().deleteMessageReaction(message_id)
     else:
         return jsonify(Error="Method not allowed."), 405
 
@@ -116,7 +124,18 @@ def messageDislikes(message_id):
     elif request.method == 'POST':
         return MessagesHandler().addMessageDislike(message_id)  # hacer un post, no put
     elif request.method == 'DELETE':
-        return MessagesHandler().deleteMessageDislike(message_id)
+        return MessagesHandler().deleteMessageReaction(message_id)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+
+@app.route('/kheApp/messages/<int:chid>/reply/<int:message_id>', methods=['POST'])
+def reply(message_id, chid):
+    if request.method == 'POST':
+        if not request.form:
+            return jsonify(Error="Missing form"), 405
+        else:
+            return MessagesHandler().postMessageReply(request.form, chid, message_id)
     else:
         return jsonify(Error="Method not allowed."), 405
 
@@ -125,7 +144,10 @@ def messageDislikes(message_id):
 def getChats():
     if request.method == 'POST':
         print("REQUEST: ", request.method)
-        return ChatHandler().insertChat(request.form)  # 'Chat created!'
+        if not request.form:
+            return jsonify(Error="Malformed post request (Did not include chatname)"), 400
+        else:
+            return ChatHandler().insertChat(request.form)  # 'Chat created!'
     else:
         if not request.form:
             return ChatHandler().getAllChats()
@@ -133,20 +155,15 @@ def getChats():
             return ChatHandler().searchChats(request.form)
 
 
-@app.route('/kheApp/messages/reply/<int:message_id>', methods=['POST'])  # this should have a delete reply option imo
-def reply(message_id):
-    if request.method == 'POST':
-        return 'Reply to message posted'
-    else:
-        return jsonify(Error="Method not allowed."), 405
-
-
 @app.route('/kheApp/chats/<int:chid>', methods=['GET', 'PUT', 'DELETE'])
 def getChatsByID(chid):
     if request.method == 'GET':
         return ChatHandler().getChatByID(chid)
     elif request.method == 'PUT':
-        return ChatHandler().updateChat(chid, request.form)  # 'Updated Chat!'
+        if not request.form:
+            return jsonify(Error="Malformed post request (Did not include chatname)"), 400
+        else:
+            return ChatHandler().updateChat(chid, request.form)  # 'Updated Chat!'
     elif request.method == 'DELETE':
         return ChatHandler().deleteChat(chid)  # 'Deleted Chat!'
     else:
@@ -157,10 +174,16 @@ def getChatsByID(chid):
 def getChatMemebersByChatID(chid):
     if request.method == 'GET':
         return ChatHandler().getChatMembersByChatID(chid)
-    elif request.method == 'POST':                                                   # CHANGED to be a post
-        return ChatHandler().addChatMember(chid, request.form)
+    elif request.method == 'POST':
+        if not request.form:
+            return jsonify(Error="Malformed post request (Did not include form)"), 400
+        else:
+            return ChatHandler().addChatMember(chid, request.form)
     elif request.method == 'DELETE':
-        return ChatHandler().deleteChatMember(chid, request.form)
+        if not request.form:
+            return jsonify(Error="Malformed post request (Did not include form)"), 400
+        else:
+            return ChatHandler().deleteChatMember(chid, request.form)
     else:
         return jsonify(Error="Method not allowed."), 405
 
@@ -226,7 +249,7 @@ def getChatsDev():
 
 
 @app.route('/kheApp/dev/chats/<int:chid>', methods=['GET'])
-def getChatsByIDDev(chid):
+def getChatOwnerByIDDev(chid):
     if request.method == 'GET':
         return ChatHandler().getChatByIDDev(chid)
     else:

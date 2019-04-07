@@ -129,9 +129,12 @@ class ChatDAO:
 
     def getAllChats(self):
         cursor = self.conn.cursor()
-        query = "select chat.chid, chat.chat_name, chat.user_id from chat, member "\
-                "where chat.chid = member.chid and member.user_id = %s;"
-        cursor.execute(query, (tokenId,))
+        query = "select distinct chat.chid, chat.chat_name, chat.user_id, usr.user_id "\
+                "from (chat full outer join member on chat.chid = member.chid), usr "\
+                "where usr.user_id = chat.user_id "\
+                "and (chat.user_id = %s "\
+                "or member.user_id = %s)"
+        cursor.execute(query, (tokenId, tokenId,))
         result = []
         for row in cursor:
             result.append(row)
@@ -139,19 +142,19 @@ class ChatDAO:
 
     def getChatByID(self, id):
         cursor = self.conn.cursor()
-        query = "select chat.chid, chat.chat_name, chat.user_id from chat, member "\
-                "where chat.chid = member.chid and member.user_id = %s and chat.chid = %s " \
-                "UNION "\
-                "select chat.chid, chat.chat_name, chat.user_id "\
-                "from chat "\
-                "where chid = %s and user_id = %s; "
-        cursor.execute(query, (tokenId, id, id, tokenId,))
+        query = "select distinct chat.chid, chat.chat_name, chat.user_id, usr.user_id "\
+                "from (chat full outer join member on chat.chid = member.chid), usr "\
+                "where usr.user_id = chat.user_id "\
+                "and (chat.user_id = %s "\
+                "or member.user_id = %s) " \
+                "and chat.chid = %s"
+        cursor.execute(query, (tokenId, tokenId, id,))
         result = cursor.fetchone()
         return result
 
     def getChatsByChatName(self, chatname):
         chat_list = self.getAllChats()
-        print(chat_list)
+        #print(chat_list)
         result = []
         for r in chat_list:
             if chatname.lower() == r[1].lower():
@@ -358,11 +361,12 @@ class MessagesDAO:
                 "where reaction = 'dislike' " \
                 "group by message.message_id) " \
                 "select message.chid, message.message, message.user_id, message.time_stamp, message.message_id, " \
-                "message_likes.likes, message_dislikes.dislikes, media.file " \
-                "from ((message left join message_likes on message_likes.mid = message.message_id) " \
+                "message_likes.likes, message_dislikes.dislikes, media.file, usr.user_name " \
+                "from (((message left join message_likes on message_likes.mid = message.message_id) " \
                 "left join message_dislikes on message_dislikes.mid = message.message_id) " \
-                "left join media on message.media_id = media.media_id " \
-                "where message.message_id = %s;"
+                "left join media on message.media_id = media.media_id), usr " \
+                "where usr.user_id = message.user_id " \
+                "and message.message_id = %s;"
         cursor.execute(query, (id,))
         result = cursor.fetchone()
         return result
@@ -389,34 +393,79 @@ class MessagesDAO:
         return result
 
 
-    def insert(self, chid, message, user_id, timestamp, likes, dislikes, image):
-        # cursor = self.conn.cursor()
-        # query = "insert into contacts(cusername, cfirstname, clastname, cemail, cphonenumber) values (%s, %s, %s, %s) returning cid;"
-        # cursor.execute(query, (cusername, cfirstname, clastname, cemail, cphonenumber))
-        # cid = cursor.fetchone()[0]
-        # self.conn.commit()
-        # return cid
-        return 7
-
-    def delete(self, cid):
-        # cursor = self.conn.cursor()
-        # query = "delete from contacts where cid = %s;"
-        # cursor.execute(query, (cid,))
-        # self.conn.commit()
-        # return cid
-        return cid
-
-    def addLike(self, message_id):
+    def insertWithoutMedia(self, chid, message):
+        cursor = self.conn.cursor()
+        query = "insert into message(message, user_id, chid, time_stamp) values (%s, %s, %s, now()) returning message_id;"
+        cursor.execute(query, (message, tokenId, chid, ))
+        message_id = cursor.fetchone()[0]
+        self.conn.commit()
         return message_id
 
-    def deleteLike(self, message_id):
+    def insert(self, chid, message, media_id):
+        cursor = self.conn.cursor()
+        query = "insert into message(message, user_id, chid, media_id, time_stamp) values (%s, %s, %s, %s, now()) returning message_id;"
+        cursor.execute(query, (message, tokenId, chid, media_id, ))
+        message_id = cursor.fetchone()[0]
+        self.conn.commit()
+        return message_id
+
+    def insertMedia(self, media):
+        cursor = self.conn.cursor()
+        query = "insert into media(file) values (%s) returning media_id;"
+        cursor.execute(query, (media,))
+        media_id = cursor.fetchone()[0]
+        self.conn.commit()
+        return media_id
+
+    def reply(self, original, message_id):
+        cursor = self.conn.cursor()
+        query = "insert into isreply(original, reply) values (%s, %s) returning reply;"
+        cursor.execute(query, (original, message_id,))
+        message_id = cursor.fetchone()[0]
+        self.conn.commit()
+        return message_id
+
+    # def delete(self, message_id):
+    #     cursor = self.conn.cursor()
+    #     query = "delete from message where message_id = %s;"
+    #     cursor.execute(query, (message_id,))
+    #     self.conn.commit()
+    #     return message_id
+
+    def addLike(self, message_id):
+        cursor = self.conn.cursor()
+        query = "insert into react(user_id, message_id, reaction, time_stamp) values (%s, %s, 'like', now()) returning message_id;"
+        cursor.execute(query, (tokenId, message_id,))
+        message_id = cursor.fetchone()[0]
+        self.conn.commit()
+        return message_id
+
+    def deleteReaction(self, message_id):
+        cursor = self.conn.cursor()
+        query = "delete from react where message_id = %s and user_id = %s;"
+        cursor.execute(query, (message_id, tokenId,))
+        self.conn.commit()
         return message_id
 
     def addDislike(self, message_id):
+        cursor = self.conn.cursor()
+        query = "insert into react(user_id, message_id, reaction, time_stamp) values (%s, %s, 'dislike', now()) returning message_id;"
+        cursor.execute(query, (tokenId, message_id,))
+        message_id = cursor.fetchone()[0]
+        self.conn.commit()
         return message_id
 
-    def deleteDislike(self, message_id):
-        return message_id
+
+    def validateReaction(self, message_id):
+        cursor = self.conn.cursor()
+        query = "select react.user_id "\
+                "from (message left join react on message.message_id = react.message_id) "\
+                "where message.message_id = %s" \
+                "and react.user_id = %s"
+        cursor.execute(query, (message_id, tokenId,))
+        result = cursor.fetchone()
+        return result
+
 
     def getAllUsersWhoLiked(self, message_id):
         cursor = self.conn.cursor()
