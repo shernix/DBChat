@@ -42,7 +42,8 @@ def logout():
     if request.method == 'POST':
         session['logged_in'] = False
         globallyChangeTokenId(-1)
-        return 'Logout successful'
+        return jsonify(Success="Logout successful."), 200
+
     return jsonify(Error="Method not allowed."), 405
 
 
