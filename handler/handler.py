@@ -637,11 +637,14 @@ class UserHandler:
         if email == ' ' and phonenumber == ' ':
             return jsonify(Error="Missing email or phone"), 400
         dao = UserDAO()
+        print(password)
+
         if dao.loginByEmail(password, email) != None:
-            return [dao.loginByEmail(password, email)[0]]
+            print(dao.loginByEmail(password, email)[0])
+            return [dao.loginByEmail(password, email)]
         if dao.loginByPhone(password, phonenumber) != None:
             return [dao.loginByPhone(password, phonenumber)[0]]
-        return -1
+        return jsonify(Error="Incorrect Credentials"), 404
 
     def getAllUsers(self):
         dao = UserDAO()

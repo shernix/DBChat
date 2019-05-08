@@ -597,7 +597,7 @@ class UserDAO:
 
     def loginByEmail(self, password, email):
         cursor = self.conn.cursor()
-        query = "select user_id from usr where password = %s and email = %s;"
+        query = "select user_id, user_name from usr where password = %s and email = %s;"
         cursor.execute(query, (password, email,))
         result = cursor.fetchone()
         return result
