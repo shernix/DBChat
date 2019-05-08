@@ -23,7 +23,7 @@ def login():
         if len(result) > 1:
             return jsonify(Error="Incorrect credentials"), 404
         cred = result[0]
-        print(result)
+        # print(result)
         # if len(id) > 1:
         #     return id
         if len(cred) > 0:
@@ -49,8 +49,14 @@ def logout():
 @app.route('/kheApp/register', methods=['POST'])
 def register():
     if request.method == 'POST':
-        # print("REQUEST: ", request.form)
-        return UserHandler().insertUser(request.form)
+        if not request.json:
+            return jsonify(Error="Missing form"), 405
+        result = UserHandler().insertUser(request.json)
+        print(result)
+        # print(result[0])
+        # print(result[1])
+
+        return result
     else:
         return jsonify(Error="Method not allowed."), 405
 
