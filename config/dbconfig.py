@@ -1,7 +1,7 @@
 # Databse configuration information
 
 pg_config = {
-    'user' : 'appuser',
-    'passwd' : 'DBChat2',
-    'dbname' : 'appdb'
+    'user' : 'diegodb',
+    'passwd' : 'Grupo123',
+    'dbname' : 'postgres'
 }
