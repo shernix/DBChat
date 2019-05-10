@@ -65,11 +65,11 @@ def register():
 @app.route('/kheApp/contacts', methods=['GET', 'POST'])
 def contacts():
     if request.method == 'POST':
-        print("REQUEST: ", request.form)
-        if not request.form:
+        print("REQUEST: ", request.json)
+        if not request.json:
             return jsonify(Error="Missing form"), 405
         else:
-            return ContactHandler().insertContact(request.form)  # 'Contact added!'
+            return ContactHandler().insertContact(request.json)  # 'Contact added!'
     else:
         if not request.args:
             return ContactHandler().getAllContacts()
