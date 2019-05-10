@@ -493,6 +493,30 @@ class MessagesDAO:
             result.append(row)
         return result
 
+    def insertHashtag(self, hashtag):
+        cursor = self.conn.cursor()
+        query = "insert into hashtag(hashtag) values (%s) returning tag_id;"
+        cursor.execute(query, (hashtag,))
+        tag_id = cursor.fetchone()[0]
+        self.conn.commit()
+        return tag_id
+
+    def validateHashtag(self, hashtag):
+        cursor = self.conn.cursor()
+        query = "select tag_id from hashtag where hashtag = %s;"
+        cursor.execute(query, (hashtag,))
+        result = cursor.fetchone()
+        return result
+
+    def addHashtagToMsgId(self, id, hashtagId):
+        cursor = self.conn.cursor()
+        query = "insert into hashash(message_id, tag_id) values (%s, %s) returning message_id;"
+        cursor.execute(query, (id, hashtagId))
+        message_id = cursor.fetchone()[0]
+        self.conn.commit()
+        return message_id
+
+
 
 class UserDAO:
     def __init__(self):
