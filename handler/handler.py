@@ -369,6 +369,7 @@ class MessagesHandler:
         result['dislikes'] = row[6]
         result['media'] = row[7]
         result['username'] = row[8]
+        result['reply'] = row[9]
         return result
 
     def mapToRepliesDict(self, row):
@@ -377,7 +378,7 @@ class MessagesHandler:
         result['reply'] = row[1]
         return result
 
-    def mapToMessageAttributes(self, chid, message, user_id, timestamp, message_id, likes, dislikes, media, username):
+    def mapToMessageAttributes(self, chid, message, user_id, timestamp, message_id, likes, dislikes, media, username, reply):
         result = {}
         result['chid'] = chid
         result['message'] = message
@@ -388,6 +389,7 @@ class MessagesHandler:
         result['dislikes'] = dislikes
         result['media'] = media
         result['username'] = username
+        result['reply'] = reply
         return result
 
     # this is only used for getting the users who liked a message so it includes a time_stamp
