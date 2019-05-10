@@ -313,7 +313,7 @@ class MessagesDAO:
                 "left join message_dislikes on message_dislikes.mid = message.message_id) " \
                 "left join media on message.media_id = media.media_id), usr " \
                 "where usr.user_id = message.user_id " \
-                "order by message.chid, message.time_stamp; "
+                "order by message.chid, message.time_stamp desc; "
         cursor.execute(query)
         result = []
         for row in cursor:
@@ -340,7 +340,7 @@ class MessagesDAO:
                 "left join media on message.media_id = media.media_id), usr " \
                 "where usr.user_id = message.user_id " \
                 "and message.chid = %s" \
-                "order by message.chid, message.time_stamp; "
+                "order by message.chid, message.time_stamp desc; "
         cursor.execute(query, (id,))
         result = []
         for row in cursor:
@@ -597,7 +597,7 @@ class UserDAO:
 
     def loginByEmail(self, password, email):
         cursor = self.conn.cursor()
-        query = "select user_id from usr where password = %s and email = %s;"
+        query = "select user_id, user_name from usr where password = %s and email = %s;"
         cursor.execute(query, (password, email,))
         result = cursor.fetchone()
         return result

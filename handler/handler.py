@@ -637,11 +637,14 @@ class UserHandler:
         if email == ' ' and phonenumber == ' ':
             return jsonify(Error="Missing email or phone"), 400
         dao = UserDAO()
+        print(password)
+
         if dao.loginByEmail(password, email) != None:
-            return [dao.loginByEmail(password, email)[0]]
+            print(dao.loginByEmail(password, email)[0])
+            return [dao.loginByEmail(password, email)]
         if dao.loginByPhone(password, phonenumber) != None:
             return [dao.loginByPhone(password, phonenumber)[0]]
-        return -1
+        return jsonify(Error="Incorrect Credentials"), 404
 
     def getAllUsers(self):
         dao = UserDAO()
@@ -695,6 +698,8 @@ class UserHandler:
 
 
     def insertUser(self, form):
+        print(form)
+        print('end json')
         # print("form: ", form)
         if form == None:
             return jsonify(Error="Malformed post request"), 400
@@ -750,10 +755,10 @@ class UserHandler:
         # Validate email or phonenumber entered at registration
         if email != ' ':
             if UserDAO().validateEmail(email) != None:
-                return jsonify(Error="email taken"), 400
+                return jsonify(Error="email taken"), 403
         if phonenumber != ' ':
             if UserDAO().validatePhone(phonenumber) != None:
-                return jsonify(Error="phonenumber taken"), 400
+                return jsonify(Error="phonenumber taken"), 403
         # OPTIONAL
         # verify username is not taken
         # if UserDAO().validateUsername(username) != None:

@@ -16,18 +16,25 @@ def index():
 @app.route('/kheApp/login', methods=['POST'])
 def login():
     if request.method == 'POST':
-        if not request.form:
+        if not request.json:
+            # print('wop')
             return jsonify(Error="Missing form"), 405
-        id = UserHandler().loginUser(request.form)
-        if len(id) > 1:
-            return jsonify(Error="Missing form"), 405
-        if id[0] > 0:
+        result = UserHandler().loginUser(request.json)
+        if len(result) > 1:
+            return jsonify(Error="Incorrect credentials"), 404
+        cred = result[0]
+        # print(result)
+        # if len(id) > 1:
+        #     return id
+        if len(cred) > 0:
             session['logged_in'] = True
-            globallyChangeTokenId(id[0])
-            return 'Login successful'
+            id = cred[0]
+            print(id)
+            globallyChangeTokenId(id)
+            return jsonify(id=id, user_name = cred[1])
         else:
-            return 'Login unsuccessful'
-    return jsonify(Error="Method not allowed."), 405
+            return jsonify(Error="Method not allowed."), 404
+    return jsonify(Error="Method not allowed."), 404
 
 
 @app.route("/kheApp/logout", methods=['POST'])
@@ -35,15 +42,22 @@ def logout():
     if request.method == 'POST':
         session['logged_in'] = False
         globallyChangeTokenId(-1)
-        return 'Logout successful'
+        return jsonify(Success="Logout successful."), 200
+
     return jsonify(Error="Method not allowed."), 405
 
 
 @app.route('/kheApp/register', methods=['POST'])
 def register():
     if request.method == 'POST':
-        # print("REQUEST: ", request.form)
-        return UserHandler().insertUser(request.form)
+        if not request.json:
+            return jsonify(Error="Missing form"), 405
+        result = UserHandler().insertUser(request.json)
+        print(result)
+        # print(result[0])
+        # print(result[1])
+
+        return result
     else:
         return jsonify(Error="Method not allowed."), 405
 
