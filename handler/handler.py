@@ -409,6 +409,10 @@ class MessagesHandler:
     # done
     def getMessagesByChatID(self, id):
 
+        chat = ChatDAO().getChatByID(id)
+        if chat == None:
+            return jsonify(Error="CHAT NOT FOUND"), 403
+
         dao = MessagesDAO()
         result = dao.getMessagesByChatID(id)
         mapped_result = []

@@ -1,7 +1,7 @@
 # Databse configuration information
 
 pg_config = {
-    'user' : 'superuser',
-    'passwd' : 'kheapp',
-    'dbname' : 'kheapp'
+    'user' : 'appuser',
+    'passwd' : 'DBChat2',
+    'dbname' : 'appdb'
 }
