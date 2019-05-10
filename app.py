@@ -181,17 +181,35 @@ def getChatMemebersByChatID(chid):
     if request.method == 'GET':
         return ChatHandler().getChatMembersByChatID(chid)
     elif request.method == 'POST':
-        if not request.form:
+        print(request.json)
+
+        if not request.json:
             return jsonify(Error="Malformed post request (Did not include form)"), 400
         else:
-            return ChatHandler().addChatMember(chid, request.form)
-    elif request.method == 'DELETE':
-        if not request.form:
-            return jsonify(Error="Malformed post request (Did not include form)"), 400
-        else:
-            return ChatHandler().deleteChatMember(chid, request.form)
+            return ChatHandler().addChatMember(chid, request.json)
+    # elif request.method == 'DELETE':
+    #     if not request.form:
+    #         print(request.form)
+    #         return jsonify(Error="Malformed post request (Did not include form)"), 400
+    #     else:
+    #         print('hello')
+    #         return ChatHandler().deleteChatMember(chid, request.form)
     else:
         return jsonify(Error="Method not allowed."), 405
+
+
+@app.route('/kheApp/chats/<int:chid>/members/<int:cid>', methods=['DELETE'])
+def deleteMemebersByChatID(chid, cid):
+    if request.method == 'DELETE':
+        if not cid:
+            print(cid)
+            return jsonify(Error="Malformed post request (Did not include form)"), 400
+        else:
+            print(cid)
+            return ChatHandler().deleteChatMember(chid, cid)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
 
 
 @app.route('/kheApp/dashboard/<stat>', methods=['GET'])

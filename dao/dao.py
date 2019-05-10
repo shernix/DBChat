@@ -384,7 +384,7 @@ class MessagesDAO:
 
     def getMessageDislikes(self, id):
         cursor = self.conn.cursor()
-        query = "select count(reaction) as likes "\
+        query = "select count(reaction) as dislikes "\
                 "from react "\
                 "where reaction = 'dislike' "\
                 "and message_id = %s;"

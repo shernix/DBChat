@@ -233,16 +233,12 @@ class ChatHandler:
             else:
                 return ContactHandler().getContactByID(dao.insertMember(chid, contact))
     # done
-    def deleteChatMember(self, chid, form):
+    def deleteChatMember(self, chid, cid):
+        print(cid)
         dao = ChatDAO()
         result = dao.getChatByID(chid)
-        if "cid" in form:
-            cid = form['cid']
-            if cid == '':
-                return jsonify(Error="Missing contact id ('cid')"), 400
-        else:
-            return jsonify(Error="Malformed post request (Did not include contact id ('cid'))"), 400
-        contact = form['cid']
+
+        contact = cid
         print(dao.isContactInChat(chid, contact))
         if result == None:
             return jsonify(Error="CHAT NOT FOUND"), 404
@@ -516,7 +512,7 @@ class MessagesHandler:
         if not dao.getMessageByID(message_id):
             return jsonify(Error="Message not found."), 404
         else:
-            dislikes = dao.getMessageLikes(message_id)
+            dislikes = dao.getMessageDislikes(message_id)
             result = {}
             result['message_id'] = dislikes[0]
             result['dislikes'] = dislikes[1]
