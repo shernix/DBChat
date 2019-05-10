@@ -295,6 +295,12 @@ class MessagesDAO:
         self.conn = psycopg2._connect(connection_url)
 
 
+
+
+    ################    Message queries now need to include isReply.original as the [9] index for msg dictionary
+
+
+
     def getAllMessages(self):
         cursor = self.conn.cursor()
         query = "with message_likes as ( " \
