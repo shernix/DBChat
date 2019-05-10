@@ -273,6 +273,7 @@ class ChatHandler:
             return jsonify(Error="Malformed search string."), 400
     # done
     def insertChat(self, form):
+        print(form)
         if form == None:
             return jsonify(Error="Malformed search string."), 400
         if "chatname" in form:

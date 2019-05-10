@@ -150,10 +150,10 @@ def reply(message_id, chid):
 def getChats():
     if request.method == 'POST':
         print("REQUEST: ", request.method)
-        if not request.form:
+        if not request.json:
             return jsonify(Error="Malformed post request (Did not include chatname)"), 400
         else:
-            return ChatHandler().insertChat(request.form)  # 'Chat created!'
+            return ChatHandler().insertChat(request.json)  # 'Chat created!'
     else:
         if not request.form:
             return ChatHandler().getAllChats()
