@@ -320,6 +320,16 @@ class MessagesDAO:
             result.append(row)
         return result
 
+    def getAllReplies(self):
+        cursor = self.conn.cursor()
+        query = "select * from isReply"
+        cursor.execute(query)
+        result = []
+        for row in cursor:
+            result.append(row)
+        return result
+
+
     # ByChatID
     def getMessagesByChatID(self, id):
         cursor = self.conn.cursor()

@@ -371,6 +371,12 @@ class MessagesHandler:
         result['username'] = row[8]
         return result
 
+    def mapToRepliesDict(self, row):
+        result = {}
+        result['original'] = row[0]
+        result['reply'] = row[1]
+        return result
+
     def mapToMessageAttributes(self, chid, message, user_id, timestamp, message_id, likes, dislikes, media, username):
         result = {}
         result['chid'] = chid
@@ -466,8 +472,8 @@ class MessagesHandler:
         message_id = self.postMessagesByChatID(form, chid)
         print(message_id)
         dao = MessagesDAO()
-        dao.reply(original, message_id)
-        result = self.getMessageByID(message_id)
+        result = dao.reply(original, message_id)
+        # result = self.getMessageByID(message_id)
         return result
 
     # def deleteMessagesByChatID(self, cid):
@@ -606,6 +612,14 @@ class MessagesHandler:
             hashtagId = dao.validateHashtag(hashtag)
         dao.addHashtagToMsgId(id, hashtagId)
         return jsonify(Status = "Message Hashtag Added"), 200
+
+    def getAllReplies(self):
+        dao = MessagesDAO()
+        result = dao.getAllReplies()
+        mapped_result = []
+        for r in result:
+            mapped_result.append(self.mapToRepliesDict(r))
+        return jsonify(Messages=mapped_result)
 
 
 ################################################################################################

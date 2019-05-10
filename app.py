@@ -138,10 +138,17 @@ def messageDislikes(message_id):
 @app.route('/kheApp/messages/<int:chid>/reply/<int:message_id>', methods=['POST'])
 def reply(message_id, chid):
     if request.method == 'POST':
-        if not request.form:
+        if not request.json:
             return jsonify(Error="Missing form"), 405
         else:
-            return MessagesHandler().postMessageReply(request.form, chid, message_id)
+            return jsonify(id=MessagesHandler().postMessageReply(request.json, chid, message_id)), 200
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+@app.route('/kheApp/messages/replies', methods=['GET'])
+def getReply():
+    if request.method == 'GET':
+        return MessagesHandler().getAllReplies()
     else:
         return jsonify(Error="Method not allowed."), 405
 
