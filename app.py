@@ -62,14 +62,6 @@ def register():
         return jsonify(Error="Method not allowed."), 405
 
 
-@app.route('/kheApp/dashboard/<stat>', methods=['GET'])
-def dashboard(stat):
-    if request.method == 'GET':
-        return DashboardHandler().getStatistics(stat)
-    else:
-        return jsonify(Error="Method not allowed."), 405
-
-
 @app.route('/kheApp/contacts', methods=['GET', 'POST'])
 def contacts():
     if request.method == 'POST':
@@ -109,10 +101,10 @@ def getMessageByChatID(chid):
     if request.method == 'GET':
         return MessagesHandler().getMessagesByChatID(chid)
     elif request.method == 'POST':
-        if not request.form:
+        if not request.json:
             return jsonify(Error="Missing form"), 405
         else:
-            return MessagesHandler().getMessageByID(MessagesHandler().postMessagesByChatID(request.form, chid))
+            return jsonify(id=MessagesHandler().postMessagesByChatID(request.json, chid)), 200  # maybe eliminate the getMessageByIdpart and leave just the ID
     # elif request.method == 'DELETE':
     #     return MessagesHandler().deleteMessagesByID(chid)
     else:
@@ -158,10 +150,10 @@ def reply(message_id, chid):
 def getChats():
     if request.method == 'POST':
         print("REQUEST: ", request.method)
-        if not request.form:
+        if not request.json:
             return jsonify(Error="Malformed post request (Did not include chatname)"), 400
         else:
-            return ChatHandler().insertChat(request.form)  # 'Chat created!'
+            return ChatHandler().insertChat(request.json)  # 'Chat created!'
     else:
         if not request.form:
             return ChatHandler().getAllChats()
@@ -200,6 +192,24 @@ def getChatMemebersByChatID(chid):
             return ChatHandler().deleteChatMember(chid, request.form)
     else:
         return jsonify(Error="Method not allowed."), 405
+
+
+@app.route('/kheApp/dashboard/<stat>', methods=['GET'])
+def dashboard(stat):
+    if request.method == 'GET':
+        return DashboardHandler().getStatistics(stat)
+    else:
+        return jsonify(Error="Method not allowed."), 405
+
+
+@app.route('/kheApp/hashtag', methods=['POST'])
+def hashtag():
+    if request.method == 'POST':
+        if not request.json:
+            return jsonify(Error="Missing form"), 405
+        else:
+            MessagesHandler().postHashtag(request.json)
+            return jsonify(Success="Hashtag updated")
 
 
 ################################################################################################

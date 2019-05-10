@@ -273,6 +273,7 @@ class ChatHandler:
             return jsonify(Error="Malformed search string."), 400
     # done
     def insertChat(self, form):
+        print(form)
         if form == None:
             return jsonify(Error="Malformed search string."), 400
         if "chatname" in form:
@@ -408,6 +409,10 @@ class MessagesHandler:
         return jsonify(Messages=mapped_result)
     # done
     def getMessagesByChatID(self, id):
+
+        chat = ChatDAO().getChatByID(id)
+        if chat == None:
+            return jsonify(Error="CHAT NOT FOUND"), 403
 
         dao = MessagesDAO()
         result = dao.getMessagesByChatID(id)
@@ -578,6 +583,33 @@ class MessagesHandler:
             for r in list:
                 mapped_result.append(self.mapToUserReactWithTimestamp(r))
             return jsonify(Dislikers=mapped_result)
+
+    def postHashtag(self, form):
+        if form == None:
+            return jsonify(Error="Malformed post request"), 400
+
+        # if hashtag is empty
+        if "hashtag" in form:
+            hashtag = form['hashtag']
+            if hashtag == '':
+                return jsonify(Error="Missing hashtag"), 400
+        else:
+            return jsonify(Error="Malformed post request"), 400
+
+        # if hashtag is empty
+        if "id" in form:
+            id = form['id']
+            if id == '':
+                return jsonify(Error="Missing id"), 400
+        else:
+            return jsonify(Error="Malformed post request"), 400
+        dao = MessagesDAO()
+        if dao.validateHashtag(hashtag) == None:
+            hashtagId = dao.insertHashtag(hashtag)
+        else:
+            hashtagId = dao.validateHashtag(hashtag)
+        dao.addHashtagToMsgId(id, hashtagId)
+        return jsonify(Status = "Message Hashtag Added"), 200
 
 
 ################################################################################################
