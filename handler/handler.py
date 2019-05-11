@@ -373,6 +373,8 @@ class MessagesHandler:
         result['dislikes'] = row[6]
         result['media'] = row[7]
         result['username'] = row[8]
+        result['liked']='true'
+        result['disliked']='true'
         return result
 
     def mapToMessageAttributes(self, chid, message, user_id, timestamp, message_id, likes, dislikes, media, username):
