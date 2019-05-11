@@ -823,21 +823,46 @@ class UserHandler:
 ################################################################################################
 
 class DashboardHandler:
-
+    
     def mapToTrendingTopicsDict(self, position, row):
         result = {}
         result['hashtag'] = row[0]
         result['used'] = row[1]
         return result
 
-    def mapToDailyPostsDict(self, row):
+    def mapToMessageRepliesDict(self, row):
         result = {}
-        result['day'] = (row[0].strftime("%Y")+ "-"+row[0].strftime("%m") +"-"+row[0].strftime("%d"))
-        result['total'] = row[1]
-        print(result['day'])
+        result['media'] = row[0]
+        result['replies'] = row[1]
         return result
 
-    def getStatistics(self, stat):
+    def mapToMessageLikesDict(self, row):
+        result = {}
+        result['media'] = row[0]
+        result['likes'] = row[1]
+        return result
+
+    def mapToMessageDislikesDict(self, row):
+        result = {}
+        result['media'] = row[0]
+        result['dislikes'] = row[1]
+        return result
+
+    def mapToDailyPostsDict(self, row):
+        result = {}
+        result['day'] = (row[0].strftime("%Y") +"-"+ row[0].strftime("%m")+"-"+ row[0].strftime("%d"))
+        result['total'] = row[1]
+        print(result)
+        return result
+
+    def mapToActiveUsersDict(self, row):
+        result = {}
+        result['day'] = (row[0].strftime("%Y"))+"-"+ (row[0].strftime("%m"))+"-"+ (row[0].strftime("%d"))
+        result['user'] = row[1]
+        result['count'] = row[2]
+        return result
+
+    def getStatistics(self, stat, form):
         dao = StatisticsDao()
         if stat == 'TrendingTopics':
             result = dao.getTrendingTopics()
@@ -852,16 +877,13 @@ class DashboardHandler:
             mapped_result = []
             for r in result:
                 mapped_result.append(self.mapToDailyPostsDict(r))
-                print(mapped_result);
             return jsonify(DailyPosts=mapped_result)
-
         if stat == 'NumberOfDailyReplies':
             result = dao.getDailyReplies()
             mapped_result = []
             for r in result:
                 mapped_result.append(self.mapToDailyPostsDict(r))
             return jsonify(DailyReplies=mapped_result)
-
         if stat == 'NumberOfDailyLikes':
             result = dao.getDailyLikes()
             mapped_result = []
@@ -874,8 +896,93 @@ class DashboardHandler:
             for r in result:
                 mapped_result.append(self.mapToDailyPostsDict(r))
             return jsonify(DailyDislikes=mapped_result)
+        if stat == 'MostActiveUsersPerDay':
+            result = dao.getMostActiveUsersPerDay()
+            mapped_result = []
+            dailybest = result[0]
+            reslen = len(result)
+            # print(dailybest)
+            # print(result[reslen - 1])
+            for r in result:
+                if dailybest[0] == r[0]:
+                    if dailybest[2] < r[2]:
+                        dailybest = r
+                else:
+                    mapped_result.append(self.mapToActiveUsersDict(dailybest))
+                    dailybest = r
+            if dailybest[0] == result[reslen - 1]:
+                if dailybest[2] < result[reslen-1][2]:
+                    dailybest = result[reslen-1]
+            else:
+                mapped_result.append(self.mapToActiveUsersDict(dailybest))
+            return jsonify(ActiveUsers=mapped_result)
+
+        # if stat == 'PostsPerDay':
+        #     id = form['user_id']
+        #     result = dao.getPostsPerDayByUser(id)
+        #     mapped_result = []
+        #     for r in result:
+        #         mapped_result.append(self.mapToActiveUsersDict(r))
+        #     return jsonify(TotalPostsPerDayByUser=mapped_result)
+
+        if stat == 'RepliesToAPhoto':
+            result = dao.getRepliesToAPhoto()
+            mapped_result = []
+            for r in result:
+                mapped_result.append(self.mapToMessageRepliesDict(r))
+            return jsonify(RepliesToAPhoto=mapped_result)
+        if stat == 'LikesToAPhoto':
+            result = dao.getLikesToAPhoto()
+            mapped_result = []
+            for r in result:
+                mapped_result.append(self.mapToMessageLikesDict(r))
+            return jsonify(LikesToAPhoto=mapped_result)
+        if stat == 'DislikesToAPhoto':
+            result = dao.getDislikesToAPhoto()
+            mapped_result = []
+            for r in result:
+                mapped_result.append(self.mapToMessageDislikesDict(r))
+            return jsonify(DislikesToAPhoto=mapped_result)
+        if stat == 'LDRToAPhoto':
+            result = dao.getLDRToAPhoto()
+            mapped_result = []
+            for r in result:
+                mapped_result.append(self.mapToSpecialStatDict(r))
+            return jsonify(SpecialStats=mapped_result)
         else:
             return jsonify(Error="Malformed search string."), 400
 
+
+
+    def mapToSpecialStatDict(self, row):
+        result = {}
+        if row[0] == None:
+            result['media'] = 0
+        else:
+            result['media'] = row[0]
+
+        if row[1] == None:
+            result['likes'] = 0
+        else:
+            result['likes'] = row[1]
+
+        if row[2] == None:
+            result['dislikes'] = 0
+        else:
+            result['dislikes'] = row[2]
+
+        if row[3] == None:
+            result['replies'] = 0
+        else:
+            result['replies'] = row[3]
+        return result
+
+    def getSpecialStatistic(self, id):
+        dao = StatisticsDao()
+        result = dao.getPostsPerDayByUser(id)
+        mapped_result = []
+        for r in result:
+            mapped_result.append(self.mapToActiveUsersDict(r))
+        return jsonify(TotalPostsPerDayByUser=mapped_result)
 
 

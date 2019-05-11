@@ -665,7 +665,7 @@ class UserDAO:
 
 
 class StatisticsDao:
-
+    
     def __init__(self):
 
         connection_url = "dbname=%s user=%s password=%s" % (pg_config['dbname'],
@@ -675,11 +675,10 @@ class StatisticsDao:
 
     def getTrendingTopics(self):
         cursor = self.conn.cursor()
-        query = "select hashtag.hashtag, count(hasHash.tag_id) as used "\
+        query = "select hashtag, count(tag_id) as position "\
                 "from hashtag natural inner join hasHash " \
-                "group by hashtag "\
-                "order by used;"\
-               
+                " group by hashtag.hashtag; "
+                
         cursor.execute(query)
         result = []
         for row in cursor:
@@ -741,6 +740,104 @@ class StatisticsDao:
                 "from react " \
                 "where reaction = 'dislike' "\
                 "group by time_stamp::timestamp::date;"
+        cursor.execute(query)
+        result = []
+        for row in cursor:
+            result.append(row)
+        return result
+
+    def getMostActiveUsersPerDay(self):
+        cursor = self.conn.cursor()
+        query = """ select time_stamp::timestamp::date as date, usr.user_name, count(message) as count
+                    from message, usr
+                    where message.user_id = usr.user_id
+                    group by time_stamp::timestamp::date, usr.user_name
+                    order by date
+                    """
+        cursor.execute(query)
+        result = []
+        for row in cursor:
+            result.append(row)
+        return result
+
+    def getPostsPerDayByUser(self, id):
+        cursor = self.conn.cursor()
+        query = """ select time_stamp::timestamp::date as date, usr.user_name, count(message) as count
+                    from message, usr
+                    where message.user_id = usr.user_id
+                    and usr.user_id = %s
+                    group by time_stamp::timestamp::date, usr.user_name
+                    order by date
+                    """
+        cursor.execute(query, (id,))
+        result = []
+        for row in cursor:
+            result.append(row)
+        return result
+
+    def getRepliesToAPhoto(self):
+        cursor = self.conn.cursor()
+        query = """ select media.file, count(msg.reply)
+                    from (isReply left join message on message.message_id = isReply.original) as msg, media
+                    where media.media_id = msg.media_id
+                    group by media.file
+                    """
+        cursor.execute(query)
+        result = []
+        for row in cursor:
+            result.append(row)
+        return result
+
+    def getLikesToAPhoto(self):
+        cursor = self.conn.cursor()
+        query = """ select media.file, count(msg.reaction)
+                    from (react left join message on message.message_id = react.message_id) as msg, media
+                    where media.media_id = msg.media_id
+                    and msg.reaction = 'like'
+                    group by media.file
+                """
+        cursor.execute(query)
+        result = []
+        for row in cursor:
+            result.append(row)
+        return result
+
+    def getDislikesToAPhoto(self):
+        cursor = self.conn.cursor()
+        query = """ select media.file, count(msg.reaction)
+                    from (react left join message on message.message_id = react.message_id) as msg, media
+                    where media.media_id = msg.media_id
+                    and msg.reaction = 'dislike'
+                    group by media.file
+                    """
+        cursor.execute(query)
+        result = []
+        for row in cursor:
+            result.append(row)
+        return result
+
+    def getLDRToAPhoto(self):
+        cursor = self.conn.cursor()
+        query = """ with message_likes as ( 
+                    select message.message_id as mid, count(reaction) as likes
+                    from message left join react on message.message_id = react.message_id
+                    where reaction = 'like'
+                    group by message.message_id),
+                    
+                    message_dislikes as (
+                    select message.message_id as mid, count(reaction) as dislikes
+                    from message left join react on message.message_id = react.message_id
+                    where reaction = 'dislike'
+                    group by message.message_id)
+                    
+                    select media.file, message_likes.likes, message_dislikes.dislikes, count(isReply.reply) as replies
+                    from ((((message left join message_likes on message_likes.mid = message.message_id)
+                    left join message_dislikes on message_dislikes.mid = message.message_id)
+                    left join isReply on isReply.original = message.message_id)
+                    right join media on message.media_id = media.media_id), usr
+                    where usr.user_id = message.user_id
+                    group by media.file, message_likes.likes, message_dislikes.dislikes;
+                """
         cursor.execute(query)
         result = []
         for row in cursor:
