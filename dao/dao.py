@@ -295,6 +295,14 @@ class MessagesDAO:
         self.conn = psycopg2._connect(connection_url)
 
 
+
+
+    ################    Message queries now need to include isReply.original as the [9] index for msg dictionary
+
+    ################    UPDATED: in theory they work
+
+
+
     def getAllMessages(self):
         cursor = self.conn.cursor()
         query = "with message_likes as ( " \
@@ -308,10 +316,11 @@ class MessagesDAO:
                 "where reaction = 'dislike' " \
                 "group by message.message_id) " \
                 "select message.chid, message.message, message.user_id, message.time_stamp, message.message_id, " \
-                "message_likes.likes, message_dislikes.dislikes, media.file, usr.user_name " \
-                "from (((message left join message_likes on message_likes.mid = message.message_id) " \
+                "message_likes.likes, message_dislikes.dislikes, media.file, usr.user_name, isReply.original " \
+                "from ((((message left join message_likes on message_likes.mid = message.message_id) " \
                 "left join message_dislikes on message_dislikes.mid = message.message_id) " \
-                "left join media on message.media_id = media.media_id), usr " \
+                "left join media on message.media_id = media.media_id)" \
+                "left join isReply on message.message_id = isReply.reply), usr " \
                 "where usr.user_id = message.user_id " \
                 "order by message.chid, message.time_stamp desc; "
         cursor.execute(query)
@@ -319,6 +328,16 @@ class MessagesDAO:
         for row in cursor:
             result.append(row)
         return result
+
+    def getAllReplies(self):
+        cursor = self.conn.cursor()
+        query = "select * from isReply"
+        cursor.execute(query)
+        result = []
+        for row in cursor:
+            result.append(row)
+        return result
+
 
     # ByChatID
     def getMessagesByChatID(self, id):
@@ -334,10 +353,11 @@ class MessagesDAO:
                 "where reaction = 'dislike' " \
                 "group by message.message_id) " \
                 "select message.chid, message.message, message.user_id, message.time_stamp, message.message_id, " \
-                "message_likes.likes, message_dislikes.dislikes, media.file, usr.user_name " \
-                "from (((message left join message_likes on message_likes.mid = message.message_id) " \
+                "message_likes.likes, message_dislikes.dislikes, media.file, usr.user_name, isReply.original " \
+                "from ((((message left join message_likes on message_likes.mid = message.message_id) " \
                 "left join message_dislikes on message_dislikes.mid = message.message_id) " \
-                "left join media on message.media_id = media.media_id), usr " \
+                "left join media on message.media_id = media.media_id)" \
+                "left join isReply on message.message_id = isReply.reply), usr " \
                 "where usr.user_id = message.user_id " \
                 "and message.chid = %s" \
                 "order by message.chid, message.time_stamp desc; "
@@ -361,10 +381,11 @@ class MessagesDAO:
                 "where reaction = 'dislike' " \
                 "group by message.message_id) " \
                 "select message.chid, message.message, message.user_id, message.time_stamp, message.message_id, " \
-                "message_likes.likes, message_dislikes.dislikes, media.file, usr.user_name " \
-                "from (((message left join message_likes on message_likes.mid = message.message_id) " \
+                "message_likes.likes, message_dislikes.dislikes, media.file, usr.user_name, isReply.original " \
+                "from ((((message left join message_likes on message_likes.mid = message.message_id) " \
                 "left join message_dislikes on message_dislikes.mid = message.message_id) " \
-                "left join media on message.media_id = media.media_id), usr " \
+                "left join media on message.media_id = media.media_id)" \
+                "left join isReply on message.message_id = isReply.reply), usr " \
                 "where usr.user_id = message.user_id " \
                 "and message.message_id = %s;"
         cursor.execute(query, (id,))
@@ -384,7 +405,7 @@ class MessagesDAO:
 
     def getMessageDislikes(self, id):
         cursor = self.conn.cursor()
-        query = "select count(reaction) as likes "\
+        query = "select count(reaction) as dislikes "\
                 "from react "\
                 "where reaction = 'dislike' "\
                 "and message_id = %s;"

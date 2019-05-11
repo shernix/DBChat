@@ -233,16 +233,12 @@ class ChatHandler:
             else:
                 return ContactHandler().getContactByID(dao.insertMember(chid, contact))
     # done
-    def deleteChatMember(self, chid, form):
+    def deleteChatMember(self, chid, cid):
+        print(cid)
         dao = ChatDAO()
         result = dao.getChatByID(chid)
-        if "cid" in form:
-            cid = form['cid']
-            if cid == '':
-                return jsonify(Error="Missing contact id ('cid')"), 400
-        else:
-            return jsonify(Error="Malformed post request (Did not include contact id ('cid'))"), 400
-        contact = form['cid']
+
+        contact = cid
         print(dao.isContactInChat(chid, contact))
         if result == None:
             return jsonify(Error="CHAT NOT FOUND"), 404
@@ -373,11 +369,21 @@ class MessagesHandler:
         result['dislikes'] = row[6]
         result['media'] = row[7]
         result['username'] = row[8]
+<<<<<<< HEAD
         result['liked']='true'
         result['disliked']='true'
+=======
+        result['reply'] = row[9]
         return result
 
-    def mapToMessageAttributes(self, chid, message, user_id, timestamp, message_id, likes, dislikes, media, username):
+    def mapToRepliesDict(self, row):
+        result = {}
+        result['original'] = row[0]
+        result['reply'] = row[1]
+>>>>>>> cce65f4518b58056b0f57d0647ea8d4df5f2e5a3
+        return result
+
+    def mapToMessageAttributes(self, chid, message, user_id, timestamp, message_id, likes, dislikes, media, username, reply):
         result = {}
         result['chid'] = chid
         result['message'] = message
@@ -388,6 +394,7 @@ class MessagesHandler:
         result['dislikes'] = dislikes
         result['media'] = media
         result['username'] = username
+        result['reply'] = reply
         return result
 
     # this is only used for getting the users who liked a message so it includes a time_stamp
@@ -472,8 +479,8 @@ class MessagesHandler:
         message_id = self.postMessagesByChatID(form, chid)
         print(message_id)
         dao = MessagesDAO()
-        dao.reply(original, message_id)
-        result = self.getMessageByID(message_id)
+        result = dao.reply(original, message_id)
+        # result = self.getMessageByID(message_id)
         return result
 
     # def deleteMessagesByChatID(self, cid):
@@ -518,7 +525,7 @@ class MessagesHandler:
         if not dao.getMessageByID(message_id):
             return jsonify(Error="Message not found."), 404
         else:
-            dislikes = dao.getMessageLikes(message_id)
+            dislikes = dao.getMessageDislikes(message_id)
             result = {}
             result['message_id'] = dislikes[0]
             result['dislikes'] = dislikes[1]
@@ -612,6 +619,14 @@ class MessagesHandler:
             hashtagId = dao.validateHashtag(hashtag)
         dao.addHashtagToMsgId(id, hashtagId)
         return jsonify(Status = "Message Hashtag Added"), 200
+
+    def getAllReplies(self):
+        dao = MessagesDAO()
+        result = dao.getAllReplies()
+        mapped_result = []
+        for r in result:
+            mapped_result.append(self.mapToRepliesDict(r))
+        return jsonify(Messages=mapped_result)
 
 
 ################################################################################################
