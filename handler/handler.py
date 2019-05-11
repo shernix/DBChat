@@ -533,9 +533,10 @@ class MessagesHandler:
         dao = MessagesDAO()
         if not dao.getMessageByID(message_id):
             return jsonify(Error="Message not found."), 404
-        elif dao.validateReaction(message_id) != None:
-            return jsonify(Error="You already reacted."), 404
+        # elif dao.validateReaction(message_id) != None:
+        #     return jsonify(Error="You already reacted."), 404
         else:
+            MessagesHandler().deleteMessageReaction(message_id)
             dao.addLike(message_id)
             return jsonify(Status = "Message Like Added"), 200
     # done
@@ -543,9 +544,10 @@ class MessagesHandler:
         dao = MessagesDAO()
         if not dao.getMessageByID(message_id):
             return jsonify(Error="Message not found."), 404
-        elif dao.validateReaction(message_id) != None:
-            return jsonify(Error="You already reacted."), 404
+        # elif dao.validateReaction(message_id) != None:
+        #     return jsonify(Error="You already reacted."), 404
         else:
+            MessagesHandler().deleteMessageReaction(message_id)
             dao.addDislike(message_id)
             return jsonify(Status = "Message Dislike Added"), 200
     # done
