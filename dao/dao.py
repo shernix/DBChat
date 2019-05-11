@@ -675,11 +675,11 @@ class StatisticsDao:
 
     def getTrendingTopics(self):
         cursor = self.conn.cursor()
-        query = "select hashtag.hashtag, count(hashtag.tag_id) as position "\
-                "from hasHash, hashtag "\
-                "where hasHash.tag_id = hashtag.tag_id "\
-                "group by hashtag.tag_id "\
-                "order by count(hashtag.tag_id) desc;"
+        query = "select hashtag.hashtag, count(hasHash.tag_id) as used "\
+                "from hashtag natural inner join hasHash " \
+                "group by hashtag "\
+                "order by used;"\
+               
         cursor.execute(query)
         result = []
         for row in cursor:
@@ -697,3 +697,52 @@ class StatisticsDao:
             result.append(row)
         return result
 
+    def getDailyReplies(self):
+        cursor = self.conn.cursor()
+        query = """ with message_likes as ( 
+                    select message.message_id as mid, count(reaction) as likes
+                    from message left join react on message.message_id = react.message_id
+                    where reaction = 'like'
+                    group by message.message_id),
+                    message_dislikes as (
+                    select message.message_id as mid, count(reaction) as dislikes
+                    from message left join react on message.message_id = react.message_id
+                    where reaction = 'dislike'
+                    group by message.message_id)
+                    select message.time_stamp::timestamp::date, count(time_stamp) as total 
+                    from ((((message left join message_likes on message_likes.mid = message.message_id)
+                    left join message_dislikes on message_dislikes.mid = message.message_id)
+                    left join media on message.media_id = media.media_id)
+                    right join isReply on message.message_id = isReply.reply), usr
+                    where usr.user_id = message.user_id
+                    group by time_stamp::timestamp::date;
+                """
+        cursor.execute(query)
+        result = []
+        for row in cursor:
+            result.append(row)
+        return result
+
+    def getDailyLikes(self):
+        cursor = self.conn.cursor()
+        query = "select time_stamp::timestamp::date, count(time_stamp) as total "\
+                "from react " \
+                "where reaction = 'like' "\
+                "group by time_stamp::timestamp::date;"
+        cursor.execute(query)
+        result = []
+        for row in cursor:
+            result.append(row)
+        return result
+
+    def getDailyDislikes(self):
+        cursor = self.conn.cursor()
+        query = "select time_stamp::timestamp::date, count(time_stamp) as total "\
+                "from react " \
+                "where reaction = 'dislike' "\
+                "group by time_stamp::timestamp::date;"
+        cursor.execute(query)
+        result = []
+        for row in cursor:
+            result.append(row)
+        return result

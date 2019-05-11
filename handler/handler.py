@@ -827,14 +827,14 @@ class DashboardHandler:
     def mapToTrendingTopicsDict(self, position, row):
         result = {}
         result['hashtag'] = row[0]
-        result['position'] = position
+        result['used'] = row[1]
         return result
 
     def mapToDailyPostsDict(self, row):
         result = {}
-        result['day'] = row[0]
+        result['day'] = (row[0].strftime("%Y")+ "-"+row[0].strftime("%m") +"-"+row[0].strftime("%d"))
         result['total'] = row[1]
-        print(row)
+        print(result['day'])
         return result
 
     def getStatistics(self, stat):
@@ -852,7 +852,28 @@ class DashboardHandler:
             mapped_result = []
             for r in result:
                 mapped_result.append(self.mapToDailyPostsDict(r))
+                print(mapped_result);
             return jsonify(DailyPosts=mapped_result)
+
+        if stat == 'NumberOfDailyReplies':
+            result = dao.getDailyReplies()
+            mapped_result = []
+            for r in result:
+                mapped_result.append(self.mapToDailyPostsDict(r))
+            return jsonify(DailyReplies=mapped_result)
+
+        if stat == 'NumberOfDailyLikes':
+            result = dao.getDailyLikes()
+            mapped_result = []
+            for r in result:
+                mapped_result.append(self.mapToDailyPostsDict(r))
+            return jsonify(DailyLikes=mapped_result)
+        if stat == 'NumberOfDailyDislikes':
+            result = dao.getDailyDislikes()
+            mapped_result = []
+            for r in result:
+                mapped_result.append(self.mapToDailyPostsDict(r))
+            return jsonify(DailyDislikes=mapped_result)
         else:
             return jsonify(Error="Malformed search string."), 400
 
