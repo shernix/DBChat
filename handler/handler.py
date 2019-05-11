@@ -369,10 +369,8 @@ class MessagesHandler:
         result['dislikes'] = row[6]
         result['media'] = row[7]
         result['username'] = row[8]
-<<<<<<< HEAD
         result['liked']='true'
         result['disliked']='true'
-=======
         result['reply'] = row[9]
         return result
 
@@ -380,7 +378,6 @@ class MessagesHandler:
         result = {}
         result['original'] = row[0]
         result['reply'] = row[1]
->>>>>>> cce65f4518b58056b0f57d0647ea8d4df5f2e5a3
         return result
 
     def mapToMessageAttributes(self, chid, message, user_id, timestamp, message_id, likes, dislikes, media, username, reply):
