@@ -227,12 +227,14 @@ def dashboard(stat):
         return jsonify(Error="Method not allowed."), 405
 
 
+
 @app.route('/kheApp/dashboard/PostsPerDayByUsers/<int:id>', methods=['GET'])
 def specialDashboard(id):
     if request.method == 'GET':
         return DashboardHandler().getSpecialStatistic(id)
     else:
         return jsonify(Error="Method not allowed."), 405
+
 
 
 @app.route('/kheApp/hashtag', methods=['POST'])

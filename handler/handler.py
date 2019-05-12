@@ -823,11 +823,11 @@ class UserHandler:
 ################################################################################################
 
 class DashboardHandler:
-
+    
     def mapToTrendingTopicsDict(self, position, row):
         result = {}
         result['hashtag'] = row[0]
-        result['position'] = position
+        result['used'] = row[1]
         return result
 
     def mapToMessageRepliesDict(self, row):
@@ -850,14 +850,14 @@ class DashboardHandler:
 
     def mapToDailyPostsDict(self, row):
         result = {}
-        result['day'] = (row[0].strftime("%Y"), row[0].strftime("%m"), row[0].strftime("%d"))
+        result['day'] = (row[0].strftime("%Y") +"-"+ row[0].strftime("%m")+"-"+ row[0].strftime("%d"))
         result['total'] = row[1]
         print(result)
         return result
 
     def mapToActiveUsersDict(self, row):
         result = {}
-        result['day'] = (row[0].strftime("%Y"), row[0].strftime("%m"), row[0].strftime("%d"))
+        result['day'] = (row[0].strftime("%Y"))+"-"+ (row[0].strftime("%m"))+"-"+ (row[0].strftime("%d"))
         result['user'] = row[1]
         result['count'] = row[2]
         return result
@@ -984,9 +984,5 @@ class DashboardHandler:
         for r in result:
             mapped_result.append(self.mapToActiveUsersDict(r))
         return jsonify(TotalPostsPerDayByUser=mapped_result)
-
-
-
-
 
 

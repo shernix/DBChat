@@ -538,6 +538,7 @@ class MessagesDAO:
         return message_id
 
 
+
 class UserDAO:
     def __init__(self):
 
@@ -664,7 +665,7 @@ class UserDAO:
 
 
 class StatisticsDao:
-
+    
     def __init__(self):
 
         connection_url = "dbname=%s user=%s password=%s" % (pg_config['dbname'],
@@ -674,11 +675,10 @@ class StatisticsDao:
 
     def getTrendingTopics(self):
         cursor = self.conn.cursor()
-        query = "select hashtag.hashtag, count(hashtag.tag_id) as position "\
-                "from hasHash, hashtag "\
-                "where hasHash.tag_id = hashtag.tag_id "\
-                "group by hashtag.tag_id "\
-                "order by count(hashtag.tag_id) desc;"
+        query = "select hashtag, count(tag_id) as position "\
+                "from hashtag natural inner join hasHash " \
+                " group by hashtag.hashtag; "
+                
         cursor.execute(query)
         result = []
         for row in cursor:
@@ -795,7 +795,7 @@ class StatisticsDao:
                     where media.media_id = msg.media_id
                     and msg.reaction = 'like'
                     group by media.file
-                    """
+                """
         cursor.execute(query)
         result = []
         for row in cursor:
@@ -843,4 +843,3 @@ class StatisticsDao:
         for row in cursor:
             result.append(row)
         return result
-
