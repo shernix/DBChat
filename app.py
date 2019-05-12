@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, session
+from flask_sqlalchemy import SQLAlchemy
 from handler.handler import ContactHandler, MessagesHandler, ChatHandler, UserHandler, DashboardHandler
 from flask_cors import CORS, cross_origin
 import os
@@ -6,7 +7,8 @@ from dao.dao import globallyChangeTokenId
 
 app = Flask(__name__)
 CORS(app)
-
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://cmrusjzyoxeliv:eb96020f35f71be5f48ea8bf1b05bbfd74f289511448ce1e9f0168224a749a56@ec2-54-225-116-36.compute-1.amazonaws.com:5432/dcrhp5031k3una'
+db = SQLAlchemy(app)
 
 @app.route('/')
 def index():

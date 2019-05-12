@@ -13,7 +13,7 @@ create table member(chid integer references chat(chid), user_id integer referenc
 create table contact(contacts integer references usr(user_id), contacted integer references usr(user_id), primary key(contacts, contacted));
 
 --photo or video table
-create table media(media_id serial primary key, mediaType char(5),  file varchar(50))
+create table media(media_id serial primary key, mediaType char(5),  file varchar(200))
 
 --messages table
 create table message(message_id serial primary key, message varchar(140), time_stamp timestamp, user_id integer references usr(user_id), chid integer references chat(chid), media_id integer references media(media_id));

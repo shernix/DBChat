@@ -426,7 +426,7 @@ class MessagesHandler:
     def postMessagesByChatID(self, form, chid):
         # cid = json['cid']
         # chid = form['chid']
-
+        print(form)
         if form == None:
             return jsonify(Error="Malformed post request"), 400
 
