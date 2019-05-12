@@ -35,27 +35,27 @@ class ContactDAO:
 
 
     # http://127.0.0.1:5000/kheApp/contacts
-    def getAllContacts(self):
+    def getAllContacts(self, userid):
         cursor = self.conn.cursor()
         query = "select user_id, user_name, first_name, last_name, email, phone_number " \
                     "from contact, usr " \
                     "where contact.contacted = usr.user_id "\
                     "and contact.contacts = %s;"
-        cursor.execute(query, (tokenId,))
+        cursor.execute(query, (userid,))
         result = []
         for row in cursor:
             result.append(row)
         return result
 
     # http://127.0.0.1:5000/kheApp/contacts/2
-    def getContactByID(self, id):
+    def getContactByID(self, userid, id):
         cursor = self.conn.cursor()
         query = "select user_id, user_name, first_name, last_name, email, phone_number " \
                     "from contact, usr " \
                     "where contact.contacted = usr.user_id "\
                     "and contact.contacted = %s "\
                     "and contact.contacts = %s;"
-        cursor.execute(query, (id, tokenId,))
+        cursor.execute(query, (id, userid,))
         result = cursor.fetchone()
         return result
 
@@ -74,10 +74,10 @@ class ContactDAO:
     # http://127.0.0.1:5000/kheApp/contacts
     # key: id   value: 2
     # key: id   value: 5
-    def insert(self, id):
+    def insert(self, userid, id):
         cursor = self.conn.cursor()
         query = "insert into contact(contacts, contacted) values (%s, %s) returning contacted;"
-        cursor.execute(query, (tokenId, id,))
+        cursor.execute(query, (userid, id,))
         cid = cursor.fetchone()[0]
         self.conn.commit()
         return cid
@@ -91,10 +91,10 @@ class ContactDAO:
     #     return cid
 
     # http://127.0.0.1:5000/kheApp/contacts/2
-    def delete(self, cid):
+    def delete(self, userid, cid):
         cursor = self.conn.cursor()
         query = "delete from contact where contacts = %s and contacted = %s;"
-        cursor.execute(query, (tokenId, cid,))
+        cursor.execute(query, (userid, cid,))
         self.conn.commit()
         return cid
 
@@ -127,20 +127,20 @@ class ChatDAO:
                                                             pg_config['passwd'])
         self.conn = psycopg2._connect(connection_url)
 
-    def getAllChats(self):
+    def getAllChats(self, userid):
         cursor = self.conn.cursor()
         query = "select distinct chat.chid, chat.chat_name, chat.user_id, usr.user_id "\
                 "from (chat full outer join member on chat.chid = member.chid), usr "\
                 "where usr.user_id = chat.user_id "\
                 "and (chat.user_id = %s "\
                 "or member.user_id = %s)"
-        cursor.execute(query, (tokenId, tokenId,))
+        cursor.execute(query, (userid, userid,))
         result = []
         for row in cursor:
             result.append(row)
         return result
 
-    def getChatByID(self, id):
+    def getChatByID(self, userid, id):
         cursor = self.conn.cursor()
         query = "select distinct chat.chid, chat.chat_name, chat.user_id, usr.user_id "\
                 "from (chat full outer join member on chat.chid = member.chid), usr "\
@@ -148,7 +148,7 @@ class ChatDAO:
                 "and (chat.user_id = %s "\
                 "or member.user_id = %s) " \
                 "and chat.chid = %s"
-        cursor.execute(query, (tokenId, tokenId, id,))
+        cursor.execute(query, (userid, userid, id,))
         result = cursor.fetchone()
         return result
 
@@ -162,10 +162,10 @@ class ChatDAO:
         return result
 
 
-    def insert(self, chname):
+    def insert(self, userid, chname):
         cursor = self.conn.cursor()
         query = "insert into chat(chat_name, user_id) values (%s, %s) returning chid;"
-        cursor.execute(query, (chname, tokenId))
+        cursor.execute(query, (chname, userid))
         chid = cursor.fetchone()[0]
         self.conn.commit()
         return chid
@@ -177,10 +177,10 @@ class ChatDAO:
         self.conn.commit()
         return chid
 
-    def delete(self, chid):
+    def delete(self, userid, chid):
         cursor = self.conn.cursor()
         query = "delete from chat where chid = %s and user_id = %s;"
-        cursor.execute(query, (chid, tokenId,))
+        cursor.execute(query, (chid, userid,))
         self.conn.commit()
         return chid
 
@@ -218,10 +218,10 @@ class ChatDAO:
         self.conn.commit()
         return contactID
 
-    def validateAdmin(self, chid):
+    def validateAdmin(self, userid, chid):
         cursor = self.conn.cursor()
         query = "select user_id from chat where chid = %sand user_id = %s;"
-        cursor.execute(query, (chid, tokenId,))
+        cursor.execute(query, (chid, userid,))
         result = cursor.fetchone()
         return result
 
@@ -414,18 +414,18 @@ class MessagesDAO:
         return result
 
 
-    def insertWithoutMedia(self, chid, message):
+    def insertWithoutMedia(self, userid, chid, message):
         cursor = self.conn.cursor()
         query = "insert into message(message, user_id, chid, time_stamp) values (%s, %s, %s, now()) returning message_id;"
-        cursor.execute(query, (message, tokenId, chid, ))
+        cursor.execute(query, (message, userid, chid, ))
         message_id = cursor.fetchone()[0]
         self.conn.commit()
         return message_id
 
-    def insert(self, chid, message, media_id):
+    def insert(self, userid, chid, message, media_id):
         cursor = self.conn.cursor()
         query = "insert into message(message, user_id, chid, media_id, time_stamp) values (%s, %s, %s, %s, now()) returning message_id;"
-        cursor.execute(query, (message, tokenId, chid, media_id, ))
+        cursor.execute(query, (message, userid, chid, media_id, ))
         message_id = cursor.fetchone()[0]
         self.conn.commit()
         return message_id
@@ -453,37 +453,37 @@ class MessagesDAO:
     #     self.conn.commit()
     #     return message_id
 
-    def addLike(self, message_id):
+    def addLike(self, userid, message_id):
         cursor = self.conn.cursor()
         query = "insert into react(user_id, message_id, reaction, time_stamp) values (%s, %s, 'like', now()) returning message_id;"
-        cursor.execute(query, (tokenId, message_id,))
+        cursor.execute(query, (userid, message_id,))
         message_id = cursor.fetchone()[0]
         self.conn.commit()
         return message_id
 
-    def deleteReaction(self, message_id):
+    def deleteReaction(self, userid, message_id):
         cursor = self.conn.cursor()
         query = "delete from react where message_id = %s and user_id = %s;"
-        cursor.execute(query, (message_id, tokenId,))
+        cursor.execute(query, (message_id, userid,))
         self.conn.commit()
         return message_id
 
-    def addDislike(self, message_id):
+    def addDislike(self, userid, message_id):
         cursor = self.conn.cursor()
         query = "insert into react(user_id, message_id, reaction, time_stamp) values (%s, %s, 'dislike', now()) returning message_id;"
-        cursor.execute(query, (tokenId, message_id,))
+        cursor.execute(query, (userid, message_id,))
         message_id = cursor.fetchone()[0]
         self.conn.commit()
         return message_id
 
 
-    def validateReaction(self, message_id):
+    def validateReaction(self, userid, message_id):
         cursor = self.conn.cursor()
         query = "select react.user_id "\
                 "from (message left join react on message.message_id = react.message_id) "\
                 "where message.message_id = %s" \
                 "and react.user_id = %s"
-        cursor.execute(query, (message_id, tokenId,))
+        cursor.execute(query, (message_id, userid,))
         result = cursor.fetchone()
         return result
 

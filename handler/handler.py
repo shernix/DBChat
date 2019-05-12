@@ -1,5 +1,6 @@
 from flask import jsonify, request
 from dao.dao import ContactDAO, ChatDAO, MessagesDAO, UserDAO, StatisticsDao
+import random
 
 
 ################################################################################################
@@ -28,17 +29,17 @@ class ContactHandler:
         result['cphonenumber'] = cphonenumber
         return result
 
-    def getAllContacts(self):
+    def getAllContacts(self, userid):
         dao = ContactDAO()
-        contact_list = dao.getAllContacts()
+        contact_list = dao.getAllContacts(userid)
         mapped_result = []
         for r in contact_list:
             mapped_result.append(self.mapToContactDict(r))
         return jsonify(Contact=mapped_result)
 
-    def getContactByID(self, id):
+    def getContactByID(self,userid, id):
         dao = ContactDAO()
-        result = dao.getContactByID(id)
+        result = dao.getContactByID(userid, id)
         print(id)
         if result == None:
             return jsonify(Error="CONTACT NOT FOUND"), 404
@@ -72,7 +73,7 @@ class ContactHandler:
         else:
             return jsonify(Error="Malformed search string."), 400
 
-    def insertContact(self, form):
+    def insertContact(self, userid, form):
         # print("form: ", form)
         if len(form) == 3:
             firstname = form['firstname']
@@ -98,10 +99,10 @@ class ContactHandler:
                     return jsonify(Error="User doesn't exist"), 400
                 cid = user[0]
                 dao =ContactDAO()
-                contact = dao.getContactByID(cid)
+                contact = dao.getContactByID(userid, cid)
                 if contact == None:
-                    cid = dao.insert(cid)
-                    return self.getContactByID(cid)
+                    cid = dao.insert(userid, cid)
+                    return self.getContactByID(userid, cid)
                 else:
                     return jsonify(Error="Contact already exists"), 400
 
@@ -111,10 +112,10 @@ class ContactHandler:
             if user == None:
                 return jsonify(Error="User doesn't exist"), 400
             dao =ContactDAO()
-            contact = dao.getContactByID(cid)
+            contact = dao.getContactByID(userid, cid)
             if contact == None:
                 cid = dao.insert(cid)
-                return self.getContactByID(cid)
+                return self.getContactByID(userid, cid)
             else:
                 return jsonify(Error="Contact already exists"), 400
         else:
@@ -142,12 +143,12 @@ class ContactHandler:
     #         else:
     #             return jsonify(Error="Unexpected attributes in update request"), 400
 
-    def deleteContact(self, cid):
+    def deleteContact(self, userid, cid):
         dao = ContactDAO()
-        if not dao.getContactByID(cid):
+        if not dao.getContactByID(userid, cid):
             return jsonify(Error="Contact not found."), 404
         else:
-            dao.delete(cid)
+            dao.delete(userid, cid)
             return jsonify(DeleteStatus = "OK"), 200
 
     def getAllContactsOfUser(self, uid):
@@ -186,9 +187,9 @@ class ChatHandler:
 
         return result
     # done
-    def getAllChats(self):
+    def getAllChats(self, userid):
         dao = ChatDAO()
-        result = dao.getAllChats()
+        result = dao.getAllChats(userid)
         mapped_result = []
         for r in result:
             mapped_result.append(self.mapToChatDict(r))
@@ -203,9 +204,9 @@ class ChatHandler:
             mapped = self.mapToChatDict(result)
             return jsonify(Chat=mapped)
     # done
-    def getChatMembersByChatID(self, chid):
+    def getChatMembersByChatID(self, userid, chid):
         dao = ChatDAO()
-        result = dao.getChatByID(chid)
+        result = dao.getChatByID(userid, chid)
         members=[]
         if result == None:
             return jsonify(Error="CHAT NOT FOUND"), 404
@@ -214,9 +215,9 @@ class ChatHandler:
                 members.append(ContactHandler().mapToContactDict(x))
             return jsonify(members=members)
     # done
-    def addChatMember(self, chid, form):
+    def addChatMember(self, userid, chid, form):
         dao = ChatDAO()
-        result = dao.getChatByID(chid)
+        result = dao.getChatByID(userid, chid)
 
         if result == None:
             return jsonify(Error="CHAT NOT FOUND"), 404
@@ -231,24 +232,24 @@ class ChatHandler:
             if dao.isContactInChat(chid, contact):
                 return jsonify(Error="Contact is already in chat"), 400
             else:
-                return ContactHandler().getContactByID(dao.insertMember(chid, contact))
+                return ContactHandler().getContactByID(userid, dao.insertMember(chid, contact))
     # done
-    def deleteChatMember(self, chid, cid):
+    def deleteChatMember(self, userid, chid, cid):
         print(cid)
         dao = ChatDAO()
-        result = dao.getChatByID(chid)
+        result = dao.getChatByID(userid, chid)
 
         contact = cid
         print(dao.isContactInChat(chid, contact))
         if result == None:
             return jsonify(Error="CHAT NOT FOUND"), 404
-        elif dao.validateAdmin(chid) == None:
+        elif dao.validateAdmin(userid, chid) == None:
             return jsonify(Error="You are not the admin of the chat!"), 400
         else:
             if len(dao.isContactInChat(chid, contact)) < 1:
                 return jsonify(Error="Contact is not in chat"), 400
             else:
-                return ContactHandler().getContactByID(dao.deleteMember(chid, contact))
+                return ContactHandler().getContactByID(userid, dao.deleteMember(chid, contact))
 
     # done
     def searchChats(self, form):
@@ -268,7 +269,7 @@ class ChatHandler:
         else:
             return jsonify(Error="Malformed search string."), 400
     # done
-    def insertChat(self, form):
+    def insertChat(self, userid, form):
         print(form)
         if form == None:
             return jsonify(Error="Malformed search string."), 400
@@ -280,7 +281,7 @@ class ChatHandler:
             return jsonify(Error="Malformed post request (Did not include chatname)"), 400
         # chname = form['chatname']
         dao = ChatDAO()
-        chid = dao.insert(chatname)
+        chid = dao.insert(userid, chatname)
         chat = dao.getChatByID(chid)
         result = self.mapToChatAttributes(chat[0], chat[1], chat[2], chat[3])
         return jsonify(Chat=result), 201
@@ -304,12 +305,12 @@ class ChatHandler:
         return jsonify(Chat=result), 200
 
     # done
-    def deleteChat(self, chid):
+    def deleteChat(self, userid, chid):
         dao = ChatDAO()
         print(chid)
-        if not dao.getChatByID(chid):
+        if not dao.getChatByID(userid, chid):
             return jsonify(Error="Chat not found."), 404
-        if dao.validateAdmin(chid) == None:
+        if dao.validateAdmin(userid, chid) == None:
             return jsonify(Error="You are not the admin of the chat!"), 400
         else:
             members = dao.getMembers(chid)
@@ -317,7 +318,7 @@ class ChatHandler:
             for member in members:
                 print(member[0])
                 dao.deleteMember(chid, member[0])
-            dao.delete(chid)
+            dao.delete(userid, chid)
             return jsonify(DeleteStatus = "OK"), 200
 
     def getChatGroupSubscribers(self, chid):
@@ -414,9 +415,9 @@ class MessagesHandler:
             mapped_result.append(self.mapToMessagesDict(r))
         return jsonify(Messages=mapped_result)
     # done
-    def getMessagesByChatID(self, id):
+    def getMessagesByChatID(self, userid, id):
 
-        chat = ChatDAO().getChatByID(id)
+        chat = ChatDAO().getChatByID(userid, id)
         if chat == None:
             return jsonify(Error="CHAT NOT FOUND"), 403
 
@@ -433,7 +434,7 @@ class MessagesHandler:
                 mapped_result.append(self.mapToMessagesDict(r))
             return jsonify(Messages=mapped_result)
     # done
-    def postMessagesByChatID(self, form, chid):
+    def postMessagesByChatID(self, userid, form, chid):
         # cid = json['cid']
         # chid = form['chid']
 
@@ -460,20 +461,20 @@ class MessagesHandler:
             return jsonify(Error="Missing message or media"), 400
         if (media == ' '):
             dao = MessagesDAO()
-            message_id = dao.insertWithoutMedia(chid, message)
+            message_id = dao.insertWithoutMedia(userid, chid, message)
             # result = self.getMessageByID(message_id)
             return message_id
         else:
             dao = MessagesDAO()
-            media_id = dao.insertMedia(media)
-            message_id = dao.insert(chid, message, media_id)
+            media_id = dao.insertMedia( media)
+            message_id = dao.insert(userid, chid, message, media_id)
             # result = self.getMessageByID(message_id)
             return message_id
         # return jsonify(Error="Unexpected attributes in post request"), 400
     # done
-    def postMessageReply(self, form, chid, original):
+    def postMessageReply(self, userid, form, chid, original):
         print(form)
-        message_id = self.postMessagesByChatID(form, chid)
+        message_id = self.postMessagesByChatID(userid, form, chid)
         print(message_id)
         dao = MessagesDAO()
         result = dao.reply(original, message_id)
@@ -529,36 +530,36 @@ class MessagesHandler:
             print(result)
             return jsonify(Disikes=result)
     # done
-    def addMessageLike(self, message_id):
+    def addMessageLike(self, userid, message_id):
         dao = MessagesDAO()
         if not dao.getMessageByID(message_id):
             return jsonify(Error="Message not found."), 404
         # elif dao.validateReaction(message_id) != None:
         #     return jsonify(Error="You already reacted."), 404
         else:
-            MessagesHandler().deleteMessageReaction(message_id)
-            dao.addLike(message_id)
+            MessagesHandler().deleteMessageReaction(userid, message_id)
+            dao.addLike(userid, message_id)
             return jsonify(Status = "Message Like Added"), 200
     # done
-    def addMessageDislike(self, message_id):
+    def addMessageDislike(self, userid, message_id):
         dao = MessagesDAO()
         if not dao.getMessageByID(message_id):
             return jsonify(Error="Message not found."), 404
         # elif dao.validateReaction(message_id) != None:
         #     return jsonify(Error="You already reacted."), 404
         else:
-            MessagesHandler().deleteMessageReaction(message_id)
-            dao.addDislike(message_id)
+            MessagesHandler().deleteMessageReaction(userid, message_id)
+            dao.addDislike(userid, message_id)
             return jsonify(Status = "Message Dislike Added"), 200
     # done
-    def deleteMessageReaction(self, message_id):
+    def deleteMessageReaction(self, userid, message_id):
         dao = MessagesDAO()
-        if not dao.getMessageByID(message_id):
+        if not dao.getMessageByID( message_id):
             return jsonify(Error="Message not found."), 404
-        elif dao.validateReaction(message_id) == None:
+        elif dao.validateReaction(userid, message_id) == None:
             return jsonify(Error="You haven't reacted."), 404
         else:
-            dao.deleteReaction(message_id)
+            dao.deleteReaction(userid, message_id)
             return jsonify(DeleteStatus = "Message Reaction Deleted"), 200
 
 
@@ -816,6 +817,20 @@ class UserHandler:
             dao = UserDAO()
             uid = dao.insert(username, firstname, lastname, email, phonenumber, password)
             return self.getUserByUserID(uid)
+
+
+    def mapToToken(self, id, rngToken):
+        result = {}
+        result['id'] = id
+        result['rngToken'] = rngToken
+        return result
+
+    def generateToken(self, id):
+        rngtoken = random.randint(0, 1000)
+        # print(rngtoken)
+        result = self.mapToToken(id, rngtoken)
+        return result
+
 
 
 ################################################################################################
