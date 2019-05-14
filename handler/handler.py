@@ -282,7 +282,7 @@ class ChatHandler:
         # chname = form['chatname']
         dao = ChatDAO()
         chid = dao.insert(userid, chatname)
-        chat = dao.getChatByID(chid)
+        chat = dao.getChatByID(userid, chid)
         result = self.mapToChatAttributes(chat[0], chat[1], chat[2], chat[3])
         return jsonify(Chat=result), 201
 
